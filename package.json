@@ -6,13 +6,17 @@
         "build": "vite build"
     },
     "devDependencies": {
+        "@vitejs/plugin-vue": "^4.2.3",
         "axios": "^1.1.2",
         "laravel-vite-plugin": "^0.7.5",
-        "vite": "^4.0.0"
+        "typescript": "^5.0.4",
+        "vite": "^4.0.0",
+        "vite-plugin-typescript": "^1.0.4"
     },
     "dependencies": {
         "d3": "^7.8.4",
         "d3-svg-legend": "^2.25.6",
+        "tslib": "^2.5.2",
         "vue": "^3.3.4",
         "vuex": "^4.1.0"
     }
