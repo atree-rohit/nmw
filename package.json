@@ -9,5 +9,11 @@
         "axios": "^1.1.2",
         "laravel-vite-plugin": "^0.7.5",
         "vite": "^4.0.0"
+    },
+    "dependencies": {
+        "d3": "^7.8.4",
+        "d3-svg-legend": "^2.25.6",
+        "vue": "^3.3.4",
+        "vuex": "^4.1.0"
     }
 }
