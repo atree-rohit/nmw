@@ -14,7 +14,7 @@ class ImportController extends Controller
     
     public function import()
     {
-        ini_set('max_execution_time', 300);
+        ini_set('max_execution_time', 600);
         // $file = fopen(public_path("/data/inat/expanded/test.csv"), "r");
         // $dir_files = scandir(public_path("/data/inat/expanded"));
         // $csv_filenames = array_filter($dir_files, function ($value) {
@@ -22,24 +22,23 @@ class ImportController extends Controller
         // });
         // dd($csv_filenames);
         // $csv_filenames = ["2020_01_01_to_2021_06_01.csv", "2021_01_01_to_2022_06_01.csv", "2022_06_01_to_present.csv", "upto_2020_01_01.csv"];
-        $csv_filenames = [ "upto_2020_01_01.csv"];
+        $csv_filenames = ["2020_01_01_to_2021_06_01.csv", "2021_01_01_to_2022_06_01.csv", "2022_06_01_to_present.csv", "upto_2020_01_01.csv"];
         $batch_size = 1000;
-        ob_start();
+        
         $this->get_foreign_ids();
-        echo "<table>";
-        foreach($this->foreign_ids["observation"] as $value){
-            echo "<tr><td>$value</td></tr>";
-        }
-        echo "</table>";
-        dd();
+        // echo "<table>";
+        // foreach($this->foreign_ids["observation"] as $value){
+        //     echo "<tr><td>$value</td></tr>";
+        // }
+        // echo "</table>";
+        // dd();
         foreach($csv_filenames as $filename){
             $this->get_foreign_ids();
             $file = fopen(public_path("/data/inat/expanded/$filename"), "r");
             $header = fgetcsv($file);
             $batch_counter = 0;
             $batch = [];
-            echo "<tr><td>$filename</td><td>";
-            ob_flush();
+            echo "$filename<br>";
             while($row = fgetcsv($file)){
                 if(!in_array($row[0], $this->foreign_ids["observation"])){
                     $combined_row = array_combine($header, $row);
@@ -47,8 +46,6 @@ class ImportController extends Controller
                     $batch_counter++;
                     if($batch_counter >= $batch_size){
                         $this->import_batch($batch);
-                        echo $batch_counter.", ";
-                        ob_flush();
                         $batch_counter = 0;
                         $batch = [];
                     }
@@ -56,14 +53,8 @@ class ImportController extends Controller
             }
             if($batch_counter > 0){
                 $this->import_batch($batch);
-                echo $batch_counter.", ";
-                ob_flush();
             }
-            echo "</td></tr>";
-            ob_flush();
         }
-        echo "</table>";
-
     }
 
     public function get_foreign_ids()
