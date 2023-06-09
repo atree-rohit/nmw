@@ -2,6 +2,8 @@
 
 namespace App\Http\Controllers;
 
+use DateTime;
+
 use Illuminate\Http\Request;
 use App\Models\InatObservation;
 use App\Models\InatUser;
@@ -10,14 +12,12 @@ use App\Models\InatLocation;
 
 class HomeController extends Controller
 {
-    public function index_1(){
+    public function index(){
         $d1 = "";
-        $d2 = "2019-01-01";
+        $d2 = "2013-01-01";
         $params = [
             "place_id" => 6681,
             "taxon_id" => 47157,
-            "d1" => "",
-            "d2" => "2019-01-01",
             "page" => 1,
             "per_page" => 1,
         ];
@@ -25,36 +25,74 @@ class HomeController extends Controller
         $pull_segments = [];
         $total = 0;
         
-        //generate manifest
+        ob_start();
+        echo "<table border='1'><tr><th>Start Date</th><th>End Date</th><th>Pages</th><th>Observations</th></tr>";
         while(!$completed_flag){
+            $increase_flag = false;
             $params["d1"] = $d1;
             $params["d2"] = $d2;
             $data = $this->inat_pull($params);
-            $pull_segments[] = [
-                "url" => http_build_query($params),
+            if($data["total_results"] > 10000){
+                $increase_flag = true;
+                $dates = [
+                    "start" => new DateTime($d1),
+                    "end" => new DateTime($d2),
+                ];
+                $interval = $dates["start"]->diff($dates["end"]);
+                if($interval->days > 31){
+                    $d2 = date("Y-m-d", strtotime($d2 . " - 1 month"));
+                } else {
+                    $half_interval = ceil($interval->days / 2);
+                    $d2 = date("Y-m-d", strtotime($d2 . " - $half_interval day"));
+                }
+                echo "<tr style='background:pink;'><td>$d1</td><td>$d2</td><td colspan='2'>Over 10,000</td></tr>";
+                ob_flush();
+                continue;
+            } 
+            // else if($data["total_results"] < 5000 && !$increase_flag){
+            //     $d2 = date("Y-m-d", strtotime($d2 . " + 1 month"));
+            //     echo "<tr><td>$d1</td><td>$d2</td><td colspan='2'>Under 5,000</td></tr>";
+            //     ob_flush();                
+            //     continue;
+            // }
+            // dd($pull_segments, $data);
+            $segment = [
+                "params" => [
+                    "d1" => $d1,
+                    "d2" => $d2,
+                ],
                 "pages" => ceil($data["total_results"] / 200),
                 "observations" => $data["total_results"],
             ];
-            if($data["total_results"] == 0 || $d2 > date("Y-m-d")){
+            $total += $data["total_results"];
+            echo "<tr>";
+            echo "<td>" . $segment["params"]["d1"] . "</td>";
+            echo "<td>" . $segment["params"]["d2"] . "</td>";
+            echo "<td>" . $segment["pages"] . "</td>";
+            echo "<td>" . $segment["observations"] . "</td>";
+            
+            echo "</tr>";
+            ob_flush();
+            $pull_segments[] = $segment;
+            if($data["total_results"] == 0 || $d2 > date("Y-m-d") || $total > 500000){
                 $completed_flag = true;
             }
             else{
-                $d1 = date("Y-m-d", strtotime($d2 . " - 1 day"));
-                $d2 = date("Y-m-d", strtotime($d2 . " + 1 year"));
+                $d1 = $d2;
+                $d2 = date("Y-m-d", strtotime($d2 . " + 6 months"));
             }
         }
-
-        foreach($segment as $pull_segments){
-
-        }
+        
+        echo "</table>";
+        dd($pull_segments);
     }
 
-    public function index() {
+    public function index_1() {
         ini_set('max_execution_time', 600);
         $segments = [
             [
                 "params" => [
-                    "d1" => "2018-12-30",
+                    "d1" => "",
                     "d2" => "2019-01-01",
                 ],
                 "pages" => 376,
@@ -105,7 +143,7 @@ class HomeController extends Controller
                 "page" => 1,
                 "per_page" => 200
             ];
-            for($i = 1; $i <= $segment["pages"] ; $i++){
+            for($i = 45; $i <= $segment["pages"] ; $i++){
                 $params["page"] = $i;
                 $data = $this->inat_pull($params);
                 $this->store_results($data["results"]);
