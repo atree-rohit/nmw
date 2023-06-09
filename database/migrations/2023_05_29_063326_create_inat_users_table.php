@@ -15,6 +15,8 @@ return new class extends Migration
             $table->id();
             $table->string('login')->nullable();
             $table->string('name')->nullable();
+            $table->string('inat_created_at')->nullable();
+            $table->string('observation_count')->nullable();
             $table->timestamps();
         });
     }
