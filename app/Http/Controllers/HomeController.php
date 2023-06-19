@@ -5,6 +5,10 @@ namespace App\Http\Controllers;
 use DateTime;
 
 use Illuminate\Http\Request;
+
+use Illuminate\Support\Facades\Http;
+
+
 use App\Models\InatObservation;
 use App\Models\InatUser;
 use App\Models\InatTaxa;
@@ -12,9 +16,66 @@ use App\Models\InatLocation;
 
 class HomeController extends Controller
 {
-    public function index(){
+    public function index()
+    {
         $d1 = "";
-        $d2 = "2013-01-01";
+        $d2 = "2011-11-01";
+        $params = [
+            "place_id" => 6681,
+            "taxon_id" => 47157,
+            "page" => 1,
+            "per_page" => 1,
+        ];
+        $completed_flag = false;
+        $total_results = 0;
+        $segments = [];        
+
+        while($completed_flag == false){
+            
+            do{
+                $params["d1"] = $d1;
+                $params["d2"] = $d2;
+                $data = $this->inatPull($params);
+                $total_results = +$data["total_results"];
+                if($data["total_results"] < 5000){
+                    $d2 = date("Y-m-d", strtotime($d2 . " + 1 months"));
+                } else if($data["total_results"] > 10000){
+                    $check = $d2;
+                    $d2 = date("Y-m-d", strtotime($d2 . " - 1 months"));
+                    if($check == $d2){
+                        dd($check, $d2);
+                    }
+                }
+            } while ($data["total_results"] < 5000 || $data["total_results"] > 10000) ;
+            $segments[] = [
+                "params" => [
+                    "d1" => $d1,
+                    "d2" => $d2,
+                ],
+                "pages" => ceil($data["total_results"] / 200),
+                "total_results" => $data["total_results"],
+            ];
+            if($data["total_results"] == 0 || $d2 > date("Y-m-d") || $total_results >= 50000){
+                $completed_flag = true;
+            }
+            else{
+                $d1 = $d2;
+                $d2 = date("Y-m-d", strtotime($d2 . " + 6 months"));
+            }
+            
+        }
+        dd($segments);
+    }
+
+    public function inatPull($params)
+    {
+        $response = Http::get('https://api.inaturalist.org/v1/observations', $params);
+        return $response->json();
+    }
+
+    public function index_2(){
+        $d1 = "";
+        $d2 = "2011-11-01";
         $params = [
             "place_id" => 6681,
             "taxon_id" => 47157,
@@ -49,13 +110,6 @@ class HomeController extends Controller
                 ob_flush();
                 continue;
             } 
-            // else if($data["total_results"] < 5000 && !$increase_flag){
-            //     $d2 = date("Y-m-d", strtotime($d2 . " + 1 month"));
-            //     echo "<tr><td>$d1</td><td>$d2</td><td colspan='2'>Under 5,000</td></tr>";
-            //     ob_flush();                
-            //     continue;
-            // }
-            // dd($pull_segments, $data);
             $segment = [
                 "params" => [
                     "d1" => $d1,
@@ -74,7 +128,8 @@ class HomeController extends Controller
             echo "</tr>";
             ob_flush();
             $pull_segments[] = $segment;
-            if($data["total_results"] == 0 || $d2 > date("Y-m-d") || $total > 500000){
+            if($data["total_results"] == 0 || $d2 > date("Y-m-d") || $total > 50000){
+                echo "<tr><td>".$data["total_results"]."</td><td>".date("Y-m-d")."</td><td>".$total."</td></tr>";
                 $completed_flag = true;
             }
             else{

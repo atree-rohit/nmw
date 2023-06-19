@@ -14,6 +14,7 @@ class ImportController extends Controller
     
     public function import()
     {
+        return view("welcome");
         ini_set('max_execution_time', 600);
         // $file = fopen(public_path("/data/inat/expanded/test.csv"), "r");
         // $dir_files = scandir(public_path("/data/inat/expanded"));
