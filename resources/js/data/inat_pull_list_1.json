@@ -1,0 +1,492 @@
+﻿[
+    {
+        "startDate": "2010-01-01",
+        "endDate": "2011-12-01",
+        "totalObservations": "5249"
+    },
+    {
+        "startDate": "2011-12-01",
+        "endDate": "2013-01-01",
+        "totalObservations": "5002"
+    },
+    {
+        "startDate": "2013-01-01",
+        "endDate": "2013-11-01",
+        "totalObservations": "5095"
+    },
+    {
+        "startDate": "2013-11-01",
+        "endDate": "2014-09-01",
+        "totalObservations": "5289"
+    },
+    {
+        "startDate": "2014-09-01",
+        "endDate": "2015-06-01",
+        "totalObservations": "5216"
+    },
+    {
+        "startDate": "2015-06-01",
+        "endDate": "2016-04-01",
+        "totalObservations": "5355"
+    },
+    {
+        "startDate": "2016-04-01",
+        "endDate": "2016-11-01",
+        "totalObservations": "5304"
+    },
+    {
+        "startDate": "2016-11-01",
+        "endDate": "2017-08-01",
+        "totalObservations": "6133"
+    },
+    {
+        "startDate": "2017-08-01",
+        "endDate": "2017-12-01",
+        "totalObservations": "6599"
+    },
+    {
+        "startDate": "2017-12-01",
+        "endDate": "2018-05-01",
+        "totalObservations": "6094"
+    },
+    {
+        "startDate": "2018-05-01",
+        "endDate": "2018-09-01",
+        "totalObservations": "5541"
+    },
+    {
+        "startDate": "2018-09-01",
+        "endDate": "2019-01-01",
+        "totalObservations": "9688"
+    },
+    {
+        "startDate": "2019-01-01",
+        "endDate": "2019-06-01",
+        "totalObservations": "5350"
+    },
+    {
+        "startDate": "2019-06-01",
+        "endDate": "2019-08-01",
+        "totalObservations": "6182"
+    },
+    {
+        "startDate": "2019-08-01",
+        "endDate": "2019-10-01",
+        "totalObservations": "9936"
+    },
+    {
+        "startDate": "2019-10-01",
+        "endDate": "2019-11-01",
+        "totalObservations": "6532"
+    },
+    {
+        "startDate": "2019-11-01",
+        "endDate": "2020-01-01",
+        "totalObservations": "8330"
+    },
+    {
+        "startDate": "2020-01-01",
+        "endDate": "2020-05-01",
+        "totalObservations": "8246"
+    },
+    {
+        "startDate": "2020-05-01",
+        "endDate": "2020-07-01",
+        "totalObservations": "7566"
+    },
+    {
+        "startDate": "2020-07-01",
+        "endDate": "2020-07-20",
+        "totalObservations": "6170"
+    },
+    {
+        "startDate": "2020-07-20",
+        "endDate": "2020-07-28",
+        "totalObservations": "7883"
+    },
+    {
+        "startDate": "2020-07-28",
+        "endDate": "2020-08-12",
+        "totalObservations": "4254"
+    },
+    {
+        "startDate": "2020-08-12",
+        "endDate": "2020-08-20",
+        "totalObservations": "4859"
+    },
+    {
+        "startDate": "2020-08-20",
+        "endDate": "2020-08-28",
+        "totalObservations": "3218"
+    },
+    {
+        "startDate": "2020-08-28",
+        "endDate": "2020-09-05",
+        "totalObservations": "3999"
+    },
+    {
+        "startDate": "2020-09-05",
+        "endDate": "2020-09-13",
+        "totalObservations": "6555"
+    },
+    {
+        "startDate": "2020-09-13",
+        "endDate": "2020-09-21",
+        "totalObservations": "9603"
+    },
+    {
+        "startDate": "2020-09-21",
+        "endDate": "2020-09-29",
+        "totalObservations": "5958"
+    },
+    {
+        "startDate": "2020-09-29",
+        "endDate": "2020-10-07",
+        "totalObservations": "5173"
+    },
+    {
+        "startDate": "2020-10-07",
+        "endDate": "2020-10-15",
+        "totalObservations": "3939"
+    },
+    {
+        "startDate": "2020-10-15",
+        "endDate": "2020-10-31",
+        "totalObservations": "6415"
+    },
+    {
+        "startDate": "2020-10-31",
+        "endDate": "2020-11-08",
+        "totalObservations": "3265"
+    },
+    {
+        "startDate": "2020-11-08",
+        "endDate": "2020-12-01",
+        "totalObservations": "5546"
+    },
+    {
+        "startDate": "2020-12-01",
+        "endDate": "2020-12-23",
+        "totalObservations": "3451"
+    },
+    {
+        "startDate": "2020-12-23",
+        "endDate": "2021-02-12",
+        "totalObservations": "6141"
+    },
+    {
+        "startDate": "2021-02-12",
+        "endDate": "2021-03-13",
+        "totalObservations": "3224"
+    },
+    {
+        "startDate": "2021-03-13",
+        "endDate": "2021-03-28",
+        "totalObservations": "3746"
+    },
+    {
+        "startDate": "2021-03-28",
+        "endDate": "2021-05-04",
+        "totalObservations": "5650"
+    },
+    {
+        "startDate": "2021-05-04",
+        "endDate": "2021-06-09",
+        "totalObservations": "5845"
+    },
+    {
+        "startDate": "2021-06-09",
+        "endDate": "2021-07-02",
+        "totalObservations": "6546"
+    },
+    {
+        "startDate": "2021-07-02",
+        "endDate": "2021-07-10",
+        "totalObservations": "3910"
+    },
+    {
+        "startDate": "2021-07-10",
+        "endDate": "2021-07-18",
+        "totalObservations": "6976"
+    },
+    {
+        "startDate": "2021-07-18",
+        "endDate": "2021-07-19",
+        "totalObservations": "2932"
+    },
+    {
+        "startDate": "2021-07-19",
+        "endDate": "2021-07-20",
+        "totalObservations": "2591"
+    },
+    {
+        "startDate": "2021-07-20",
+        "endDate": "2021-07-28",
+        "totalObservations": "8344"
+    },
+    {
+        "startDate": "2021-07-28",
+        "endDate": "2021-08-05",
+        "totalObservations": "5432"
+    },
+    {
+        "startDate": "2021-08-05",
+        "endDate": "2021-08-13",
+        "totalObservations": "4018"
+    },
+    {
+        "startDate": "2021-08-13",
+        "endDate": "2021-08-21",
+        "totalObservations": "3153"
+    },
+    {
+        "startDate": "2021-08-21",
+        "endDate": "2021-08-29",
+        "totalObservations": "3406"
+    },
+    {
+        "startDate": "2021-08-29",
+        "endDate": "2021-09-06",
+        "totalObservations": "6357"
+    },
+    {
+        "startDate": "2021-09-06",
+        "endDate": "2021-09-14",
+        "totalObservations": "5563"
+    },
+    {
+        "startDate": "2021-09-14",
+        "endDate": "2021-09-22",
+        "totalObservations": "4485"
+    },
+    {
+        "startDate": "2021-09-22",
+        "endDate": "2021-09-30",
+        "totalObservations": "7070"
+    },
+    {
+        "startDate": "2021-09-30",
+        "endDate": "2021-10-08",
+        "totalObservations": "4186"
+    },
+    {
+        "startDate": "2021-10-08",
+        "endDate": "2021-10-16",
+        "totalObservations": "3346"
+    },
+    {
+        "startDate": "2021-10-16",
+        "endDate": "2021-10-24",
+        "totalObservations": "2999"
+    },
+    {
+        "startDate": "2021-10-24",
+        "endDate": "2021-11-01",
+        "totalObservations": "3392"
+    },
+    {
+        "startDate": "2021-11-01",
+        "endDate": "2021-11-09",
+        "totalObservations": "3060"
+    },
+    {
+        "startDate": "2021-11-09",
+        "endDate": "2021-11-24",
+        "totalObservations": "3989"
+    },
+    {
+        "startDate": "2021-11-24",
+        "endDate": "2021-12-09",
+        "totalObservations": "4763"
+    },
+    {
+        "startDate": "2021-12-09",
+        "endDate": "2021-12-24",
+        "totalObservations": "3730"
+    },
+    {
+        "startDate": "2021-12-24",
+        "endDate": "2022-01-07",
+        "totalObservations": "3113"
+    },
+    {
+        "startDate": "2022-01-07",
+        "endDate": "2022-01-29",
+        "totalObservations": "3272"
+    },
+    {
+        "startDate": "2022-01-29",
+        "endDate": "2022-02-13",
+        "totalObservations": "3237"
+    },
+    {
+        "startDate": "2022-02-13",
+        "endDate": "2022-03-15",
+        "totalObservations": "5903"
+    },
+    {
+        "startDate": "2022-03-15",
+        "endDate": "2022-03-30",
+        "totalObservations": "3899"
+    },
+    {
+        "startDate": "2022-03-30",
+        "endDate": "2022-04-30",
+        "totalObservations": "8912"
+    },
+    {
+        "startDate": "2022-04-30",
+        "endDate": "2022-05-14",
+        "totalObservations": "3613"
+    },
+    {
+        "startDate": "2022-05-14",
+        "endDate": "2022-05-30",
+        "totalObservations": "5455"
+    },
+    {
+        "startDate": "2022-05-30",
+        "endDate": "2022-06-07",
+        "totalObservations": "3153"
+    },
+    {
+        "startDate": "2022-06-07",
+        "endDate": "2022-06-30",
+        "totalObservations": "6960"
+    },
+    {
+        "startDate": "2022-06-30",
+        "endDate": "2022-07-16",
+        "totalObservations": "5862"
+    },
+    {
+        "startDate": "2022-07-16",
+        "endDate": "2022-07-24",
+        "totalObservations": "5280"
+    },
+    {
+        "startDate": "2022-07-24",
+        "endDate": "2022-07-27",
+        "totalObservations": "4471"
+    },
+    {
+        "startDate": "2022-07-27",
+        "endDate": "2022-08-04",
+        "totalObservations": "7849"
+    },
+    {
+        "startDate": "2022-08-04",
+        "endDate": "2022-08-20",
+        "totalObservations": "6084"
+    },
+    {
+        "startDate": "2022-08-20",
+        "endDate": "2022-08-28",
+        "totalObservations": "4304"
+    },
+    {
+        "startDate": "2022-08-28",
+        "endDate": "2022-09-05",
+        "totalObservations": "4436"
+    },
+    {
+        "startDate": "2022-09-05",
+        "endDate": "2022-09-13",
+        "totalObservations": "4953"
+    },
+    {
+        "startDate": "2022-09-13",
+        "endDate": "2022-09-21",
+        "totalObservations": "5493"
+    },
+    {
+        "startDate": "2022-09-21",
+        "endDate": "2022-09-29",
+        "totalObservations": "6088"
+    },
+    {
+        "startDate": "2022-09-29",
+        "endDate": "2022-10-07",
+        "totalObservations": "5116"
+    },
+    {
+        "startDate": "2022-10-07",
+        "endDate": "2022-10-15",
+        "totalObservations": "4590"
+    },
+    {
+        "startDate": "2022-10-15",
+        "endDate": "2022-10-23",
+        "totalObservations": "5264"
+    },
+    {
+        "startDate": "2022-10-23",
+        "endDate": "2022-10-31",
+        "totalObservations": "4246"
+    },
+    {
+        "startDate": "2022-10-31",
+        "endDate": "2022-11-23",
+        "totalObservations": "6648"
+    },
+    {
+        "startDate": "2022-11-23",
+        "endDate": "2022-12-16",
+        "totalObservations": "5459"
+    },
+    {
+        "startDate": "2022-12-16",
+        "endDate": "2022-12-31",
+        "totalObservations": "3130"
+    },
+    {
+        "startDate": "2022-12-31",
+        "endDate": "2023-01-15",
+        "totalObservations": "2677"
+    },
+    {
+        "startDate": "2023-01-15",
+        "endDate": "2023-02-06",
+        "totalObservations": "3555"
+    },
+    {
+        "startDate": "2023-02-06",
+        "endDate": "2023-02-23",
+        "totalObservations": "3937"
+    },
+    {
+        "startDate": "2023-02-23",
+        "endDate": "2023-03-17",
+        "totalObservations": "3229"
+    },
+    {
+        "startDate": "2023-03-17",
+        "endDate": "2023-04-01",
+        "totalObservations": "2744"
+    },
+    {
+        "startDate": "2023-04-01",
+        "endDate": "2023-04-16",
+        "totalObservations": "3489"
+    },
+    {
+        "startDate": "2023-04-16",
+        "endDate": "2023-05-01",
+        "totalObservations": "8209"
+    },
+    {
+        "startDate": "2023-05-01",
+        "endDate": "2023-05-09",
+        "totalObservations": "3236"
+    },
+    {
+        "startDate": "2023-05-09",
+        "endDate": "2023-05-25",
+        "totalObservations": "5340"
+    },
+    {
+        "startDate": "2023-05-25",
+        "endDate": "2023-06-09",
+        "totalObservations": "3704"
+    }
+]

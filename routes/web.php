@@ -17,3 +17,4 @@ use App\Http\Controllers\ImportController;
 
 Route::get('/', [HomeController::class, 'index']);
 Route::get('import', [ImportController::class, 'import']);
+Route::post('add_data', [ImportController::class, 'add_data']);

@@ -1,6 +1,7 @@
 import { createStore } from 'vuex'
 import * as d3 from 'd3'
 import moment from 'moment'
+import inat_pull_list from './data/inat_pull_list_1.json'
 import districts from './geojson/districts.json'
 import states from './geojson/states.json'
 import regions from './geojson/regions.json'
@@ -35,16 +36,27 @@ const store = createStore({
             initializeData(state, 'taxa', 'taxa');
         },
         async INIT_API(state) {
-            let startDate = new Date("2010-01-01");
-            let endDate = new Date('2011-12-01')
+            let startDate = new Date("2023-02-06")
+            let endDate = new Date("2023-02-16")
             let slices = [];
             let pullFlag = true
             let count = 0;
+            let last_pull_time = new Date()
             while (pullFlag) {
-                const data = await getInatObservations(startDate, endDate);
+                let time_since_last_pull = moment(new Date()).diff(last_pull_time, 'second')
+                // do{
+                //     time_since_last_pull = moment(new Date()).diff(last_pull_time, 'second')
+                //     setTimeout(() => {
+                //     }, 1500)
+                //     console.log("wait")
+                    
+                    
+                // } while(time_since_last_pull < 15)
+                const data = await getInatObservations(startDate, endDate)
+                last_pull_time = new Date()
                 const totalObservations = data.total_results
             
-                if (totalObservations < 7500){
+                if (totalObservations < 2500){
                     endDate = await updateEndDate("+", startDate, endDate, totalObservations)
                     console.log("<", formatDate(endDate), totalObservations)
                 } else if(totalObservations >= 10000){
@@ -60,76 +72,23 @@ const store = createStore({
                     startDate = new Date(endDate);
                     endDate = await updateEndDate("=", startDate, endDate, totalObservations)
                     console.log("=", formatDate(endDate))
+                    console.log(slices)
                 }
                 count++;
-                if(endDate > new Date() || slices.length > 100){
+                if(endDate > new Date() || slices.length > 25 || startDate > endDate){
                     pullFlag = false
                 }
-                setTimeout(() => {
-                    console.log(1)
-                  }, 60000)
+                // pullFlag = false
             }
             console.table(slices)
+            console.log(slices)
             console.log(startDate, endDate, slices)
         },
-        async INIT_APIx(state) {
-            let totalObservations = 0;
-            let pullSegments = [];
-
-            let today = new Date();
-            // let startDate = new Date('2000-01-01');
-            // let endDate = new Date('2011-10-01');
-            let startDate = new Date('2020-05-01');
-            let endDate = new Date('2020-11-01');
-            let pull_flag = true;
-            let iteration_count = 0;
-
-            while (pull_flag) {
-                const params = {
-                    place_id: 6681,
-                    taxon_id: 47157,
-                    per_page: 1,
-                    d1: formatDate(startDate),
-                    d2: formatDate(endDate),
-                };
-
-                const data = await inatPull(params);
-                const totalResults = data.total_results;
-
-                if (totalResults < 2500 && iteration_count < 5) {
-                    console.log("+", totalResults, totalObservations)
-                    endDate.setMonth(endDate.getMonth() + 1);
-                    iteration_count++;
-                } else if(totalResults >= 9500){
-                    console.log("-", totalResults, totalObservations, formatDate(startDate), formatDate(endDate))
-                    if(endDate.getMonth() - startDate.getMonth() > 2){
-                        endDate.setMonth(endDate.getMonth() -1);
-                    } else {
-                        let midDate = (endDate.getTime() + startDate.getTime())/ (1000 * 60 * 60 * 24 * 2)
-                        console.log(midDate)
-                        endDate.setDate(midDate-1);
-                    }
-                    iteration_count++
-                } else {
-                    console.log(params, totalResults, totalObservations)
-                    pullSegments.push({
-                        start_date: formatDate(startDate),
-                        end_date: formatDate(endDate),
-                        observations: totalResults,
-                    });
-                    totalObservations += totalResults;
-                    startDate = new Date(formatDate(endDate))
-                    endDate.setMonth(endDate.getMonth() + 6);
-                    iteration_count = 0
-                }
-                if(endDate > today || totalResults == 0 || totalObservations >= 100000){
-                    console.log(endDate > today, totalResults == 0, totalObservations >= 100000, iteration_count)
-                    pull_flag = false;
-                }
-            }
-            state.urls = pullSegments
-            console.table(state.urls)
-            // return pullSegments;
+        async PULL_INAT_DATA(state) {
+            // console.log(inat_pull_list)
+            let inat_data = await inatPull({...inat_pull_list[0], page: 1})
+            axios.post("/add_data", inat_data)
+            // console.log(inat_data.results[0])
         }
     },
     actions: {
@@ -137,7 +96,8 @@ const store = createStore({
             // this.commit("INIT_OBSERVATIONS")
             // this.commit("INIT_USERS")
             // this.commit("INIT_TAXA")
-            this.commit("INIT_API")
+            // this.commit("INIT_API")
+            this.commit("PULL_INAT_DATA")
 
         }
     },
@@ -174,12 +134,23 @@ function formatDate(date) {
 }
 
 function inatPull(params) {
-    const url = 'https://api.inaturalist.org/v1/observations';
-    return axios.get(url, { params }).then(response => response.data);
+    let url = 'https://api.inaturalist.org/v1/observations?'
+    let parameters = {
+        place_id: 6681,
+        taxon_id: 47157,
+        per_page: 10,
+        page: params.page,
+        d1: params.startDate,
+        d2: params.endDate,
+    }
+    let pars = []
+    Object.keys(parameters).forEach(key => pars.push(`${key}=${parameters[key]}`))
+    url = url + pars.join('&')
+    return axios.get(url).then(response => response.data)
 }
 
 function getInatObservations(startDate, endDate) {
-    // console.log("pull", formatDate(startDate), formatDate(endDate))
+    console.log("pull", formatDate(startDate), formatDate(endDate))
     const params = {
         place_id: 6681,
         taxon_id: 47157,
@@ -187,36 +158,43 @@ function getInatObservations(startDate, endDate) {
         d1: formatDate(startDate),
         d2: formatDate(endDate),
     };
-    setTimeout(() => {
-        console.log(1)
-      }, 60000)
+    
     return axios.get('https://api.inaturalist.org/v1/observations', { params }).then(response => response.data);
 }
 
 function getObservationsPerDay(start, end, observations){
-    let total_days = (end.getTime() - start.getTime()) / (1000 * 60 * 60 * 24)
+    let total_days = moment(end).diff(moment(start), 'day')
     return observations / total_days
 }
 
 async function updateEndDate(type, start, end, observations){
     let op = end
     let difference = moment(end).diff(moment(start), 'day')
+    let obv_per_day = getObservationsPerDay(start, end, observations)
     if(type == "+"){
-        if(difference > 50){
-            op = moment(end).add(1, 'month')
-        } else {
-            op = moment(end).add(8, 'day')
-        }
+        // if(observations < 100){
+        //     op = moment(end).add(3, 'month')
+        // } else if (observations < 1000){
+        //     op = moment(end).add(2, 'month')
+        // } else if (observations < 5000){
+        //     op = moment(end).add(1, 'month')
+        // } else {
+        //     op = moment(end).add(1, 'day')
+        // }
+        op = moment(end).add(7, 'day')
     } else if (type == "-"){
         if(difference > 50){
             op = moment(end).subtract(1, 'month')
+        } else if(difference > 25) {
+            op = moment(start).subtract(15, 'day')
         } else {
-            op = moment(start).subtract(Math.ceil(difference/2), 'day')
+            op = moment(start).subtract(1, 'day')
         }
     } else if(type == "="){
+        console.log(55, start, end, observations)
         let obs_per_day = getObservationsPerDay(start, end, observations)
         let days = Math.ceil(9000/obs_per_day)
-        op = moment(end).add(days, 'day')
+        op = moment(end).add(1, 'day')
     }
     return new Date(op.format("YYYY-MM-DD"))
 }

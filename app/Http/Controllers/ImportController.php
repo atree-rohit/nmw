@@ -58,6 +58,18 @@ class ImportController extends Controller
         }
     }
 
+    public function add_data(Request $request) {
+        $data = $request["results"];
+        // dd(22, $data, $request->all());
+        foreach($data as $d){
+            $this->add_observation($d);
+        }
+    }
+
+    public function add_observation($data){
+        dd(1, $data);
+    }
+
     public function get_foreign_ids()
     {
         $all_locations = InatLocation::select("id", "latitude", "longitude")->get()->toArray();

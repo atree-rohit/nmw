@@ -18,6 +18,7 @@ class HomeController extends Controller
 {
     public function index()
     {
+        dd(1);
         $d1 = "";
         $d2 = "2011-11-01";
         $params = [
