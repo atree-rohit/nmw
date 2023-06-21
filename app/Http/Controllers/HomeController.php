@@ -16,7 +16,11 @@ use App\Models\InatLocation;
 
 class HomeController extends Controller
 {
-    public function index()
+    public function index(){
+        $data = InatObservation::get()->groupBy("observed_on");
+        dd($data);
+    }
+    public function index_3()
     {
         dd(1);
         $d1 = "";

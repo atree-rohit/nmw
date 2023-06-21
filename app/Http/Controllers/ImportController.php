@@ -58,16 +58,229 @@ class ImportController extends Controller
         }
     }
 
-    public function add_data(Request $request) {
-        $data = $request["results"];
-        // dd(22, $data, $request->all());
-        foreach($data as $d){
-            $this->add_observation($d);
+    public function pull_data() {
+        $urls = [
+            "2010-07-20 to 2010-07-31" => [
+              "total_results" => 31,
+              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2010-07-20&d2=2010-07-31&per_page=1"
+            ],
+            "2011-07-20 to 2011-07-31" => [
+              "total_results" => 242,
+              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2011-07-20&d2=2011-07-31&per_page=1"
+            ],
+            "2012-07-20 to 2012-07-31" => [
+              "total_results" => 435,
+              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2012-07-20&d2=2012-07-31&per_page=1"
+            ],
+            "2013-07-20 to 2013-07-31" => [
+              "total_results" => 156,
+              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2013-07-20&d2=2013-07-31&per_page=1"
+            ],
+            "2014-07-20 to 2014-07-31" => [
+              "total_results" => 212,
+              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2014-07-20&d2=2014-07-31&per_page=1"
+            ],
+            "2015-07-20 to 2015-07-31" => [
+              "total_results" => 204,
+              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2015-07-20&d2=2015-07-31&per_page=1"
+            ],
+            "2016-07-20 to 2016-07-31" => [
+              "total_results" => 322,
+              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2016-07-20&d2=2016-07-31&per_page=1"
+            ],
+            "2017-07-20 to 2017-07-31" => [
+              "total_results" => 815,
+              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2017-07-20&d2=2017-07-31&per_page=1"
+            ],
+            "2018-07-20 to 2018-07-31" => [
+              "total_results" => 606,
+              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2018-07-20&d2=2018-07-31&per_page=1"
+            ],
+            "2019-07-20 to 2019-07-31" => [
+              "total_results" => 2102,
+              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2019-07-20&d2=2019-07-31&per_page=1"
+            ],
+            "2020-07-20 to 2020-07-31" => [
+              "total_results" => 8472,
+              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2020-07-20&d2=2020-07-31&per_page=1"
+            ],
+            "2021-07-20 to 2021-07-25" => [
+              "total_results" => 6821,
+              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2021-07-20&d2=2021-07-25&per_page=1"
+            ],
+            "2021-07-25 to 2021-07-31" => [
+              "total_results" => 4839,
+              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2021-07-25&d2=2021-07-31&per_page=1"
+            ],
+            "2022-07-20 to 2022-07-25" => [
+              "total_results" => 4588,
+              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2022-07-20&d2=2022-07-25&per_page=1"
+            ],
+            "2022-07-25 to 2022-07-31" => [
+              "total_results" => 8605,
+              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2022-07-25&d2=2022-07-31&per_page=1"
+            ]
+        ];
+
+
+        /*
+        $urls_data = [];
+        foreach($urls as $k => $u){
+            $year = explode("-", $k)[0];
+            if(!isset($urls_data[$year])){
+                $urls_data[$year] = 0;
+            }
+            $urls_data[$year] += $u["total_results"];
         }
+        $all_observations = InatObservation::get()->groupBy("observed_on");
+        $count_data = [];
+        foreach($all_observations as $date => $o){
+            $year = explode("-", $date)[0];
+            if(!isset($count_data[$year])){
+                $count_data[$year] = 0;
+            }
+            $count_data[$year] += count($o);
+
+        }
+        dd($urls_data, $count_data);
+        */
+
+
+
+        $per_page = 200;
+        $counts = [];
+        ob_start();
+        echo "<table border='2'>";
+        foreach($urls as $k=>$v){
+            $start = explode(" to ", $k)[0];
+            $end = explode(" to ", $k)[1];
+            $counts[$k] = [
+                "added" => 0,
+                "skipped" => 0,
+                "total" => $v["total_results"],
+                "ranges" => [],
+            ];
+            
+            if($v["total_results"] < $per_page){
+                $data = $this->pull_inat_data($start, $end, $per_page, 1);
+                $count_data = $this->add_observations($data);
+                $counts[$k]["added"] += $count_data["added"];
+                $counts[$k]["skipped"] += $count_data["skipped"];
+                $counts[$k]["ranges"][] = "$start to $end";
+            } else {
+                for($i = 30; $i <= (($v["total_results"] / $per_page) + 1) ; $i++){
+                    $data = $this->pull_inat_data($start, $end, $per_page, $i);
+                    $count_data = $this->add_observations($data);
+                    $counts[$k]["added"] += $count_data["added"];
+                    $counts[$k]["skipped"] += $count_data["skipped"];
+                    $counts[$k]["ranges"][] = "$start to $end - page $i";
+                }
+            }
+            if (ob_get_length()) ob_end_flush();
+            // echo "$k > ".json_encode($counts[$k])."<br>";
+            echo "<tr>";
+            echo "<td>" . $counts[$k]["added"] . "</td>";
+            echo "<td>" . $counts[$k]["skipped"] . "</td>";
+            echo "<td>" . $counts[$k]["total"] . "</td>";
+            echo "<td><table border='1'>";
+            foreach($counts[$k]["ranges"] as $r){
+                echo "<tr><td>$r</td></tr>";
+            }
+            echo "</table></td>";
+            echo "</tr>";
+            flush();
+        }
+        echo "</table>";
+    }
+    public function pull_data_1() {
+        
+        $all_data = [];
+        for($y = 2010 ; $y < 2023 ; $y++){
+            $start = "$y-07-20";
+            $end = "$y-07-31";
+            $data = $this->pull_inat_data($start, $end, 1, 1);
+            if($data["total_results"] > 9500){
+                $start = "$y-07-20";
+                $end = "$y-07-25";
+                $data = $this->pull_inat_data($start, $end, 1, 1);
+                $all_data["$start to $end"] = $data;
+                $start = "$y-07-25";
+                $end = "$y-07-31";
+                $data = $this->pull_inat_data($start, $end, 1, 1);
+                $all_data["$start to $end"] = $data;
+            } else {
+                $all_data["$start to $end"] = $data;
+            }
+        }
+        dd($all_data);
+    }
+    public function get_pull_url($start, $end, $per_page, $page_no) {
+        return "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=$start&d2=$end&per_page=$per_page&page=$page_no";
+    }
+
+    
+    public function pull_inat_data($start, $end, $per_page, $page_no) {
+        $url = $this->get_pull_url($start, $end, $per_page, $page_no);
+        $data = json_decode(file_get_contents($url), true);
+        $data["url"] = $url;
+        return $data;
+    }
+
+    public function add_observations($data){
+        $existing_observation_ids = InatObservation::get()->pluck("id")->toArray();
+        $counts = [
+            "added" => 0,
+            "skipped" => 0,
+        ];
+        if($data["results"] > 0){
+            foreach($data["results"] as $row){
+                if(!in_array($row["id"], $existing_observation_ids)){
+                    $this->add_observation($row);
+                    $counts["added"]++;
+                } else {
+                    $counts["skipped"]++;
+                }
+            }
+        }
+        return $counts;
     }
 
     public function add_observation($data){
-        dd(1, $data);
+        $this->add_user($data["user"]);
+        $this->add_taxa($data["taxon"]);
+        $obv = InatObservation::firstOrCreate([
+            "id" => $data["id"],
+            "observed_on" => $data["observed_on"],
+            "inat_created_at" => $data["created_at"],
+            "inat_updated_at" => $data["updated_at"],
+            "quality_grade" => $data["quality_grade"],
+            "license" => $data["license_code"],
+            "image_url" => $data["photos"][0]["url"] ?? null,
+            "num_identification_agreements" => $data["num_identification_agreements"],
+            "num_identification_disagreements" => $data["num_identification_disagreements"],
+            "oauth_application_id" => $data["oauth_application_id"],
+            "user_id" => $data["user"]["id"],
+            "taxa_id" => $data["taxon"]["id"],
+        ]);
+    }
+
+    public function add_user($data){
+        InatUser::firstOrCreate([
+            "id" => $data["id"],
+            "login" => $data["login"],
+            "name" => $data["name"]
+        ]);
+    }
+
+
+    public function add_taxa($data){
+        InatTaxa::firstOrCreate([
+            "id" => $data["id"],
+            "scientific_name" => $data["name"],
+            "common_name" => $data["preferred_common_name"] ?? null,
+            "rank" => $data["rank"],
+            "ancestry" => $data["ancestry"]
+        ]);
     }
 
     public function get_foreign_ids()

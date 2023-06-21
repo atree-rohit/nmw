@@ -97,7 +97,7 @@ const store = createStore({
             // this.commit("INIT_USERS")
             // this.commit("INIT_TAXA")
             // this.commit("INIT_API")
-            this.commit("PULL_INAT_DATA")
+            // this.commit("PULL_INAT_DATA")
 
         }
     },
