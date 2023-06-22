@@ -17,8 +17,42 @@ use App\Models\InatLocation;
 class HomeController extends Controller
 {
     public function index(){
-        $data = InatObservation::get()->groupBy("observed_on");
-        dd($data);
+        $data = InatObservation::where("nmw", '!=',null)->get()->groupBy("nmw");
+        dd($data["2012"][0]);
+
+    }
+    public function index_add_nmw_year(){
+        $data = InatObservation::where("nmw", null)->get()->groupBy("observed_on");
+        // dd($data);
+        $nmw_dates = [
+            2012 => [23,29],
+            2013 => [20,28],
+            2014 => [19,27],
+            2015 => [18,26],
+            2016 => [23,31],
+            2017 => [22,30],
+            2018 => [21,29],
+            2019 => [20,28],
+            2020 =>  [18,26],
+            2021 =>  [17,25],
+            2022 =>  [23,31],
+            2023 =>  [22,30],
+        ];
+        foreach($data as $y => $observations){
+            $year = explode("-", $y)[0];
+            $day = explode("-", $y)[2];
+            if(isset($nmw_dates[$year])){
+                if($day >= $nmw_dates[$year][0] && $day <= $nmw_dates[$year][1]){
+                    foreach($observations as $o){
+                        $o->nmw = $year;
+                        $o->save();
+                    }
+                }
+            }
+
+            
+        }
+        
     }
     public function index_3()
     {

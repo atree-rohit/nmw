@@ -122,6 +122,25 @@ class ImportController extends Controller
             ]
         ];
 
+        $urls = [
+            // "2014-07-19 to 2014-07-21" => [
+            //     "total_results" => 53,
+            //     "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&per_page=1&d1=2014-07-19&d2=2014-07-21"
+            // ],
+            // "2015-07-18 to 2015-07-21" => [
+            //     "total_results" => 95,
+            //     "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&per_page=1&d1=2015-07-18&d2=2015-07-21"
+            // ],
+            // "2020-07-18 to 2020-07-21" => [
+            //     "total_results" => 3265,
+            //     "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&per_page=1&d1=2020-07-18&d2=2020-07-21"
+            // ],
+            "2021-07-17 to 2021-07-21" => [
+                "total_results" => 5104,
+                "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&per_page=1&d1=2021-07-18&d2=2021-07-21"
+            ]
+        ];
+
 
         /*
         $urls_data = [];
@@ -168,7 +187,7 @@ class ImportController extends Controller
                 $counts[$k]["skipped"] += $count_data["skipped"];
                 $counts[$k]["ranges"][] = "$start to $end";
             } else {
-                for($i = 30; $i <= (($v["total_results"] / $per_page) + 1) ; $i++){
+                for($i = 10; $i <= 21 ; $i++){
                     $data = $this->pull_inat_data($start, $end, $per_page, $i);
                     $count_data = $this->add_observations($data);
                     $counts[$k]["added"] += $count_data["added"];
@@ -246,8 +265,16 @@ class ImportController extends Controller
     }
 
     public function add_observation($data){
-        $this->add_user($data["user"]);
-        $this->add_taxa($data["taxon"]);
+        $existing_ids = [
+            "users" => InatUser::get()->pluck("id")->toArray(),
+            "taxa" => InatTaxa::get()->pluck("id")->toArray(),
+        ];
+        if(!in_array($data["user"]["id"], $existing_ids["users"])){
+            $this->add_user($data["user"]);
+        }
+        if(!in_array($data["taxon"]["id"], $existing_ids["taxa"])){
+            $this->add_taxa($data["taxon"]);
+        }
         $obv = InatObservation::firstOrCreate([
             "id" => $data["id"],
             "observed_on" => $data["observed_on"],

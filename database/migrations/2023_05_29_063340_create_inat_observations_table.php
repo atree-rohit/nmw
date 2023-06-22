@@ -22,6 +22,7 @@ return new class extends Migration
             $table->integer('num_identification_agreements')->nullable();
             $table->integer('num_identification_disagreements')->nullable();
             $table->string('oauth_application_id')->nullable();
+            $table->integer('nmw')->nullable();
             $table->unsignedBigInteger('user_id')->nullable();
             $table->unsignedBigInteger('taxa_id')->nullable();
             $table->unsignedBigInteger('location_id')->nullable();
