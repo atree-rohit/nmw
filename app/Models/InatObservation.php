@@ -14,6 +14,8 @@ class InatObservation extends Model
         "observed_on",
         "inat_created_at",
         "inat_updated_at",
+        "latitude",
+        "longitude",
         "quality_grade",
         "license",
         "image_url",
