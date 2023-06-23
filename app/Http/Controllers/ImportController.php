@@ -57,123 +57,233 @@ class ImportController extends Controller
             }
         }
     }
+    public function get_pull_urls_1() {
+        $urls = [
+            "2012-07-23 to 2012-07-29" => [
+                "total_results" => 385,
+                "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2012-07-23&d2=2012-07-29&per_page=1&page=1"
+            ],
+            "2013-07-20 to 2013-07-28" => [
+                "total_results" => 126,
+                "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2013-07-20&d2=2013-07-28&per_page=1&page=1"
+            ],
+            "2014-07-19 to 2014-07-27" => [
+                "total_results" => 200,
+                "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2014-07-19&d2=2014-07-27&per_page=1&page=1"
+            ],
+            "2015-07-18 to 2015-07-26" => [
+                "total_results" => 215,
+                "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2015-07-18&d2=2015-07-26&per_page=1&page=1"
+            ],
+            "2016-07-23 to 2016-07-31" => [
+                "total_results" => 267,
+                "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2016-07-23&d2=2016-07-31&per_page=1&page=1"
+            ],
+            "2017-07-22 to 2017-07-30" => [
+                "total_results" => 655,
+                "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2017-07-22&d2=2017-07-30&per_page=1&page=1"
+            ],
+            "2018-07-21 to 2018-07-29" => [
+                "total_results" => 491,
+                "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2018-07-21&d2=2018-07-29&per_page=1&page=1"
+            ],
+            "2019-07-20 to 2019-07-28" => [
+                "total_results" => 1591,
+                "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2019-07-20&d2=2019-07-28&per_page=1&page=1"
+            ],
+            "2020-07-18 to 2020-07-22" => [
+                "total_results" => 4169,
+                "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2020-07-18&d2=2020-07-22&per_page=1&page=1"
+            ],
+            "2020-07-23 to 2020-07-26" => [
+                "total_results" => 4803,
+                "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2020-07-23&d2=2020-07-26&per_page=1&page=1"
+            ],
+            "2021-07-17 to 2021-07-19" => [
+                "total_results" => 11560,
+                "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2021-07-17&d2=2021-07-19&per_page=1&page=1"
+            ],
+            "2021-07-20 to 2021-07-22" => [
+                "total_results" => 11560,
+                "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2021-07-20&d2=2021-07-22&per_page=1&page=1"
+            ],
+            "2021-07-23 to 2021-07-25" => [
+                "total_results" => 11560,
+                "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2021-07-23&d2=2021-07-25&per_page=1&page=1"
+            ],
+            "2022-07-23 to 2022-07-25" => [
+                "total_results" => 11154,
+                "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2022-07-23&d2=2022-07-31&per_page=1&page=1"
+            ],
+            "2022-07-26 to 2022-07-28" => [
+                "total_results" => 11154,
+                "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2022-07-23&d2=2022-07-31&per_page=1&page=1"
+            ],
+            "2022-07-29 to 2022-07-31" => [
+                "total_results" => 11154,
+                "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2022-07-23&d2=2022-07-31&per_page=1&page=1"
+            ]
+        ];
+        $new_urls = [];
+        foreach($urls as $k => $v){
+            $start = explode(" to ", $k)[0];
+            $end = explode(" to ", $k)[1];
+            $url = $this->get_pull_url($start, $end, 1, 1);
+            $data = json_decode(file_get_contents($url, true));
+            $results = $data->total_results;
+            $new_urls[] = [
+                "start" => $start,
+                "end" => $end,
+                "total_results" => $results,
+                "url" => $url
+            ];
+        }
+        dd($new_urls, json_encode($new_urls));
 
+    }
+
+    //get pull urls
+    public function get_pull_urls() {
+        $nmw_dates = [
+            2012 => [23,29],
+            2013 => [20,28],
+            2014 => [19,27],
+            2015 => [18,26],
+            2016 => [23,31],
+            2017 => [22,30],
+            2018 => [21,29],
+            2019 => [20,28],
+            2020 =>  [18,26],
+            2021 =>  [17,25],
+            2022 =>  [23,31],
+        ];
+        $urls = [];
+        foreach($nmw_dates as $year => $dates){
+            $start = "$year-07-".$dates[0];
+            $end = "$year-07-".$dates[1];
+            $url = $this->get_pull_url($start, $end, 1, 1);
+            $data = json_decode(file_get_contents($url, true));
+            $results = $data->total_results;
+            if($results > 3500){
+
+            }
+            $urls["$start to $end"] = [
+                "total_results" => $data->total_results,
+                "url" => $url
+            ];
+        }
+        dd($urls);
+    }
     public function pull_data() {
+        ini_set('max_execution_time', 300);
         $urls = [
-            "2010-07-20 to 2010-07-31" => [
-              "total_results" => 31,
-              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2010-07-20&d2=2010-07-31&per_page=1"
-            ],
-            "2011-07-20 to 2011-07-31" => [
-              "total_results" => 242,
-              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2011-07-20&d2=2011-07-31&per_page=1"
-            ],
-            "2012-07-20 to 2012-07-31" => [
-              "total_results" => 435,
-              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2012-07-20&d2=2012-07-31&per_page=1"
-            ],
-            "2013-07-20 to 2013-07-31" => [
-              "total_results" => 156,
-              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2013-07-20&d2=2013-07-31&per_page=1"
-            ],
-            "2014-07-20 to 2014-07-31" => [
-              "total_results" => 212,
-              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2014-07-20&d2=2014-07-31&per_page=1"
-            ],
-            "2015-07-20 to 2015-07-31" => [
-              "total_results" => 204,
-              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2015-07-20&d2=2015-07-31&per_page=1"
-            ],
-            "2016-07-20 to 2016-07-31" => [
-              "total_results" => 322,
-              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2016-07-20&d2=2016-07-31&per_page=1"
-            ],
-            "2017-07-20 to 2017-07-31" => [
-              "total_results" => 815,
-              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2017-07-20&d2=2017-07-31&per_page=1"
-            ],
-            "2018-07-20 to 2018-07-31" => [
-              "total_results" => 606,
-              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2018-07-20&d2=2018-07-31&per_page=1"
-            ],
-            "2019-07-20 to 2019-07-31" => [
-              "total_results" => 2102,
-              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2019-07-20&d2=2019-07-31&per_page=1"
-            ],
-            "2020-07-20 to 2020-07-31" => [
-              "total_results" => 8472,
-              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2020-07-20&d2=2020-07-31&per_page=1"
-            ],
-            "2021-07-20 to 2021-07-25" => [
-              "total_results" => 6821,
-              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2021-07-20&d2=2021-07-25&per_page=1"
-            ],
-            "2021-07-25 to 2021-07-31" => [
-              "total_results" => 4839,
-              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2021-07-25&d2=2021-07-31&per_page=1"
-            ],
-            "2022-07-20 to 2022-07-25" => [
-              "total_results" => 4588,
-              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2022-07-20&d2=2022-07-25&per_page=1"
-            ],
-            "2022-07-25 to 2022-07-31" => [
-              "total_results" => 8605,
-              "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2022-07-25&d2=2022-07-31&per_page=1"
+            // [
+            //     "start" => "2012-07-23",
+            //     "end" => "2012-07-29",
+            //     "total_results" => 385,
+            //     "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2012-07-23&d2=2012-07-29&per_page=1&page=1",
+            // ],
+            // [
+            //     "start" => "2013-07-20",
+            //     "end" => "2013-07-28",
+            //     "total_results" => 126,
+            //     "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2013-07-20&d2=2013-07-28&per_page=1&page=1",
+            // ],
+            // [
+            //     "start" => "2014-07-19",
+            //     "end" => "2014-07-27",
+            //     "total_results" => 200,
+            //     "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2014-07-19&d2=2014-07-27&per_page=1&page=1",
+            // ],
+            // [
+            //     "start" => "2015-07-18",
+            //     "end" => "2015-07-26",
+            //     "total_results" => 215,
+            //     "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2015-07-18&d2=2015-07-26&per_page=1&page=1",
+            // ],
+            // [
+            //     "start" => "2016-07-23",
+            //     "end" => "2016-07-31",
+            //     "total_results" => 267,
+            //     "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2016-07-23&d2=2016-07-31&per_page=1&page=1",
+            // ],
+            // [
+            //     "start" => "2017-07-22",
+            //     "end" => "2017-07-30",
+            //     "total_results" => 655,
+            //     "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2017-07-22&d2=2017-07-30&per_page=1&page=1",
+            // ],
+            // [
+            //     "start" => "2018-07-21",
+            //     "end" => "2018-07-29",
+            //     "total_results" => 491,
+            //     "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2018-07-21&d2=2018-07-29&per_page=1&page=1",
+            // ],
+            // [
+            //     "start" => "2019-07-20",
+            //     "end" => "2019-07-28",
+            //     "total_results" => 1591,
+            //     "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2019-07-20&d2=2019-07-28&per_page=1&page=1",
+            // ],
+            // [
+            //     "start" => "2020-07-18",
+            //     "end" => "2020-07-22",
+            //     "total_results" => 4169,
+            //     "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2020-07-18&d2=2020-07-22&per_page=1&page=1",
+            // ],
+            // [
+            //     "start" => "2020-07-23",
+            //     "end" => "2020-07-26",
+            //     "total_results" => 4803,
+            //     "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2020-07-23&d2=2020-07-26&per_page=1&page=1",
+            // ],
+            // [
+            //     "start" => "2021-07-17",
+            //     "end" => "2021-07-19",
+            //     "total_results" => 4738,
+            //     "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2021-07-17&d2=2021-07-19&per_page=1&page=1",
+            // ],
+            // [
+            //     "start" => "2021-07-20",
+            //     "end" => "2021-07-22",
+            //     "total_results" => 3176,
+            //     "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2021-07-20&d2=2021-07-22&per_page=1&page=1",
+            // ],
+            // [
+            //     "start" => "2021-07-23",
+            //     "end" => "2021-07-25",
+            //     "total_results" => 3646,
+            //     "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2021-07-23&d2=2021-07-25&per_page=1&page=1",
+            // ],
+            // [
+            //     "start" => "2022-07-23",
+            //     "end" => "2022-07-25",
+            //     "total_results" => 3408,
+            //     "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2022-07-23&d2=2022-07-25&per_page=1&page=1",
+            // ],
+            // [
+            //     "start" => "2022-07-26",
+            //     "end" => "2022-07-28",
+            //     "total_results" => 3552,
+            //     "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2022-07-26&d2=2022-07-28&per_page=1&page=1",
+            // ],
+            [
+                "start" => "2022-07-29",
+                "end" => "2022-07-31",
+                "total_results" => 4194,
+                "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&d1=2022-07-29&d2=2022-07-31&per_page=1&page=1",
             ]
         ];
-
-        $urls = [
-            // "2014-07-19 to 2014-07-21" => [
-            //     "total_results" => 53,
-            //     "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&per_page=1&d1=2014-07-19&d2=2014-07-21"
-            // ],
-            // "2015-07-18 to 2015-07-21" => [
-            //     "total_results" => 95,
-            //     "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&per_page=1&d1=2015-07-18&d2=2015-07-21"
-            // ],
-            // "2020-07-18 to 2020-07-21" => [
-            //     "total_results" => 3265,
-            //     "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&per_page=1&d1=2020-07-18&d2=2020-07-21"
-            // ],
-            "2021-07-17 to 2021-07-21" => [
-                "total_results" => 5104,
-                "url" => "https://api.inaturalist.org/v1/observations?order=desc&order_by=created_at&place_id=6681&taxon_id=47157&per_page=1&d1=2021-07-18&d2=2021-07-21"
-            ]
-        ];
-
-
-        /*
-        $urls_data = [];
-        foreach($urls as $k => $u){
-            $year = explode("-", $k)[0];
-            if(!isset($urls_data[$year])){
-                $urls_data[$year] = 0;
-            }
-            $urls_data[$year] += $u["total_results"];
-        }
-        $all_observations = InatObservation::get()->groupBy("observed_on");
-        $count_data = [];
-        foreach($all_observations as $date => $o){
-            $year = explode("-", $date)[0];
-            if(!isset($count_data[$year])){
-                $count_data[$year] = 0;
-            }
-            $count_data[$year] += count($o);
-
-        }
-        dd($urls_data, $count_data);
-        */
-
-
 
         $per_page = 200;
         $counts = [];
         ob_start();
         echo "<table border='2'>";
-        foreach($urls as $k=>$v){
-            $start = explode(" to ", $k)[0];
-            $end = explode(" to ", $k)[1];
-            $counts[$k] = [
+        foreach($urls as $v){
+            $start = $v["start"];
+            $end = $v["end"];
+            $key = "$start to $end";
+            $counts[$key] = [
                 "added" => 0,
                 "skipped" => 0,
                 "total" => $v["total_results"],
@@ -183,26 +293,26 @@ class ImportController extends Controller
             if($v["total_results"] < $per_page){
                 $data = $this->pull_inat_data($start, $end, $per_page, 1);
                 $count_data = $this->add_observations($data);
-                $counts[$k]["added"] += $count_data["added"];
-                $counts[$k]["skipped"] += $count_data["skipped"];
-                $counts[$k]["ranges"][] = "$start to $end";
+                $counts[$key]["added"] += $count_data["added"];
+                $counts[$key]["skipped"] += $count_data["skipped"];
+                $counts[$key]["ranges"][] = "$start to $end";
             } else {
-                for($i = 10; $i <= 21 ; $i++){
+                for($i = 1; $i <= ($v["total_results"]/$per_page) + 1 ; $i++){
                     $data = $this->pull_inat_data($start, $end, $per_page, $i);
                     $count_data = $this->add_observations($data);
-                    $counts[$k]["added"] += $count_data["added"];
-                    $counts[$k]["skipped"] += $count_data["skipped"];
-                    $counts[$k]["ranges"][] = "$start to $end - page $i";
+                    $counts[$key]["added"] += $count_data["added"];
+                    $counts[$key]["skipped"] += $count_data["skipped"];
+                    $counts[$key]["ranges"][] = "$start to $end - page $i";
                 }
             }
             if (ob_get_length()) ob_end_flush();
-            // echo "$k > ".json_encode($counts[$k])."<br>";
+            // echo "$key > ".json_encode($counts[$key])."<br>";
             echo "<tr>";
-            echo "<td>" . $counts[$k]["added"] . "</td>";
-            echo "<td>" . $counts[$k]["skipped"] . "</td>";
-            echo "<td>" . $counts[$k]["total"] . "</td>";
+            echo "<td>" . $counts[$key]["added"] . "</td>";
+            echo "<td>" . $counts[$key]["skipped"] . "</td>";
+            echo "<td>" . $counts[$key]["total"] . "</td>";
             echo "<td><table border='1'>";
-            foreach($counts[$k]["ranges"] as $r){
+            foreach($counts[$key]["ranges"] as $r){
                 echo "<tr><td>$r</td></tr>";
             }
             echo "</table></td>";
@@ -269,17 +379,23 @@ class ImportController extends Controller
             "users" => InatUser::get()->pluck("id")->toArray(),
             "taxa" => InatTaxa::get()->pluck("id")->toArray(),
         ];
+        
         if(!in_array($data["user"]["id"], $existing_ids["users"])){
             $this->add_user($data["user"]);
         }
         if(!in_array($data["taxon"]["id"], $existing_ids["taxa"])){
             $this->add_taxa($data["taxon"]);
         }
+        $coordinates = $data["location"];
+        $lat = trim(explode(",",$coordinates)[0]);
+        $lon = trim(explode(",",$coordinates)[1]);
         $obv = InatObservation::firstOrCreate([
             "id" => $data["id"],
             "observed_on" => $data["observed_on"],
             "inat_created_at" => $data["created_at"],
             "inat_updated_at" => $data["updated_at"],
+            "latitude" => $lat,
+            "longitude" => $lon,
             "quality_grade" => $data["quality_grade"],
             "license" => $data["license_code"],
             "image_url" => $data["photos"][0]["url"] ?? null,
