@@ -177,6 +177,7 @@ export default defineComponent({
         }
     },
     mounted(){
+		console.log("Map")
 		console.clear()
         this.init_tooltip()
 		this.init()

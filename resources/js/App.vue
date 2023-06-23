@@ -1,6 +1,7 @@
 <template>
     <div>
-        Store data 
+        <Map />
+        
     </div>
 </template>
 
@@ -8,22 +9,19 @@
     import { defineComponent } from 'vue'
     import {mapState} from 'vuex'
     import store from './store'
+    import Map from './components/Map.vue'
 
     export default defineComponent({
         name: "App",
+        components: {
+            Map
+        },
         computed:{
-            ...mapState(["inat_data"])
+            
         },
         watch:{
-            inat_data:{
-                handler(){
-                    console.log("this.inat_data")
-                },
-                deep:true
-            }
         },
         mounted() {
-            // console.log(this.inat_data)
             store.dispatch("initData")
         },
     })

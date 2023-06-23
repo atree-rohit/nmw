@@ -37,10 +37,7 @@ const store = createStore({
         INIT_LOCATIONS(state) {
             console.log('init locations')
             axios.get("/locations")
-                .then((response) => {
-                    state.locations = response.data
-                    console.log(response.data)
-                })
+                .then((response) => state.locations = response.data)
         }        
     },
     actions: {
