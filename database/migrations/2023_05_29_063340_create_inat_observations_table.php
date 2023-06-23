@@ -16,6 +16,8 @@ return new class extends Migration
             $table->string('observed_on')->nullable();
             $table->string('inat_created_at')->nullable();
             $table->string('inat_updated_at')->nullable();
+            $table->float('latitude', 16,12)->nullable();
+            $table->float('longitude', 16,12)->nullable();
             $table->string('quality_grade')->nullable();
             $table->string('license')->nullable();
             $table->text('image_url')->nullable();
