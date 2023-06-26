@@ -1,7 +1,12 @@
 <template>
     <div>
+        <!-- <pre>
+            {{ expandedData }}
+        </pre>
+        <pre>
+            {{ polygonData }}
+        </pre> -->
         <Map />
-        
     </div>
 </template>
 
@@ -17,12 +22,17 @@
             Map
         },
         computed:{
-            
+            polygonData() {
+                return this.$store.getters.polygon_data
+            },
+            expandedData() {
+                return this.$store.getters.expanded_data
+            },
         },
         watch:{
         },
-        mounted() {
-            store.dispatch("initData")
+        created() {
+            // store.dispatch("initData")
         },
     })
 </script>

@@ -6,12 +6,41 @@
 		display: flex;
 		justify-content: space-around;
 	}
+	.map-controls{
+		display: grid;
+		grid-template-rows: 1fr 1fr;
+	}
+	.map-controls .switcher{
+		display: flex;
+		justify-content: center;
+		align-items: center;
+	}
+	.switcher{
+		margin: .25rem;
+	}
+	.switcher .btn{
+		cursor: pointer;
+		border-radius: 0 0 0 0;
+		border: 1px solid #aaa;
+		padding: .25rem 1rem;
+		
+	}
+	.switcher .btn:first-child{
+		border-radius: 1rem  0 0 1rem;
+	}
+	.switcher .btn:last-child{
+		border-radius: 0 1rem 1rem 0;
+	}
+	.switcher .btn.selected{
+		background: green;
+		color:white;
+	}
 	#map #map-stats{
 		border: 1px solid pink;
 		width: 50%;
 		margin: 0 5px;
 		max-height: 80vh;
-		overflow:hidden;
+		overflow:scroll;
 	}
 	#map-container {
 		display:flex;
@@ -98,9 +127,17 @@
 	th,td{
         border: 1px solid white;
     }
+	th{
+		white-space: nowrap;
+		border: 1px solid #555;
+		cursor: pointer;
+	}
     td {
         padding: 0.5rem 1rem;
     }
+	tbody tr:hover td{
+		background: #ffa;
+	}
 	@media screen and (max-width: 800px) {
 		.poly_text{
 			font-size: 3.5vw;
@@ -110,30 +147,88 @@
 
 <template>
     <div ref="mapDiv">
-		<div class="switcher switcher-sm">
-			<button
-				class="btn"
-				v-for="pm in polygon_modes"
-				:key="pm"
-				:class="{'selected': pm === polygon_mode}"
-				@click="polygon_mode = pm"
-				v-text="pm"
-			/>
-		</div>
-		<div class="switcher switcher-sm">
-			<button
-				class="btn"
-				v-for="dm in data_modes"
-				:key="dm"
-				:class="{'selected': dm === data_mode}"
-				@click="data_mode = dm"
-				v-text="dm"
-			/>
+		<div class="map-controls">
+			<div class="switcher switcher-sm">
+				<button
+					class="btn"
+					v-for="pm in polygon_modes"
+					:key="pm"
+					:class="{'selected': pm === polygon_mode}"
+					@click="polygon_mode = pm"
+					v-text="pm"
+				/>
+			</div>
+			<div class="switcher switcher-sm">
+				<button
+					class="btn"
+					v-for="dm in data_modes"
+					:key="dm"
+					:class="{'selected': dm === data_mode}"
+					@click="data_mode = dm"
+					v-text="dm"
+				/>
+			</div>
+			<div class="switcher switcher-sm">
+				<button
+					class="btn"
+					v-for="ny in nmw_years"
+					:key="ny"
+					:class="{'selected': selected_years.includes(ny)}"
+					@click="selectYear(ny)"
+					v-text="ny"
+				/>
+			</div>
 		</div>
 		<div id="map">
 			<div id="map-container"></div>
 			<div id="map-stats">
-				<data-table	:table_data="selectedData" />
+				<table class="table">
+					<thead>
+						<tr>
+							<th>Name</th>
+							<th @click="sortBy('observations')">Observations
+								<span v-if="data_mode == 'observations'">
+									<span v-if="sort_dir == 'desc'">▼</span>
+									<span v-else>▲</span>
+								</span>
+							</th>
+							<th @click="sortBy('users')">Users
+								<span v-if="data_mode == 'users'">
+									<span v-if="sort_dir == 'desc'">▼</span>
+									<span v-else>▲</span>
+								</span>
+							</th>
+							<th @click="sortBy('taxa')">Taxa
+								<span v-if="data_mode == 'taxa'">
+									<span v-if="sort_dir == 'desc'">▼</span>
+									<span v-else>▲</span>
+								</span>
+							</th>
+							<th @click="sortBy('locations')">Locations
+								<span v-if="data_mode == 'locations'">
+									<span v-if="sort_dir == 'desc'">▼</span>
+									<span v-else>▲</span>
+								</span>
+							</th>
+							<th @click="sortBy('nmw')">NMW
+								<span v-if="data_mode == 'nmw'">
+									<span v-if="sort_dir == 'desc'">▼</span>
+									<span v-else>▲</span>
+								</span>
+							</th>
+						</tr>
+					</thead>
+					<tbody>
+						<tr v-for="(row, k) in sortedData" :key="k">
+							<td v-text="row.name"/>
+							<td v-text="row.observations"/>
+							<td v-text="row.users"/>
+							<td v-text="row.taxa"/>
+							<td v-text="row.locations"/>
+							<td v-text="row.nmw"/>
+						</tr>						
+					</tbody>
+				</table>
 			</div>
 		</div>
 	</div>
@@ -141,6 +236,7 @@
 
 <script lang="js">
 import { defineComponent } from 'vue'
+import store from '../store'
 import {mapState} from 'vuex'
 import * as d3 from 'd3'
 import * as d3Legend from "d3-svg-legend"
@@ -154,9 +250,11 @@ export default defineComponent({
         return {
 			polygon_modes: ["districts", "states", "regions"],
 			polygon_mode: "districts",
-			data_modes: ["observations", "users", "unique_taxa", "species_count", "unidentified"],
+			data_modes: ["observations", "users", "taxa", "locations", "nmw"],
 			data_mode: "observations",
-            polygons: null,
+			nmw_years: [2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022],
+			nmw_year:[2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022],
+			sort_dir: "desc",
 			path: null,
 			svg: {},
 			projection: {},
@@ -176,17 +274,22 @@ export default defineComponent({
 			tooltip:null,
         }
     },
-    mounted(){
-		console.log("Map")
+	created(){
 		console.clear()
-        this.init_tooltip()
-		this.init()
+		store.dispatch("initData")
+		console.log("Map")
+		this.init_tooltip()
+	},
+    mounted(){
+		// this.init()
 		// if(this.regional_data.length > 0){
 		// }
     },
 	watch:{
-		regional_data(){
-			this.init()
+		polygon_data(){
+			if(Object.keys(this.polygon_data.districts).length > 0){
+				this.init()
+			}
 		},
 		polygon_mode(){
 			this.renderMap()
@@ -197,45 +300,75 @@ export default defineComponent({
 
 	},
     computed:{
-        ...mapState(["regional_data", "geojson"]),
-        json(){
-            return geojson
-        },
-		polygon_key(){
-			return this.polygon_mode.slice(0,-1)
-		},
+        ...mapState(["geojson", "regional_data", "polygon_data", "selected_years"]),
 		mapData(){
-			return this.regional_data[this.polygon_mode].map((d) => {
-				return {
-					name: d[this.polygon_key],
-					value: d[this.data_mode]
-				}
-			})	
+			return this.polygon_data[this.polygon_mode]
 		},
 		selectedData(){
-			let op = {}
-			if(this.selected.region){
-				op = {
-					region: this.regional_data.regions.find((d) => d.region == this.selected.region),
-					states: this.regional_data.states.filter((d) => d.region == this.selected.region),
-					districts: this.regional_data.districts.filter((d) => d.region == this.selected.region)
+			let data = this.polygon_data[this.polygon_mode]
+			let selected = Object.keys(this.selected).find((d) => this.selected[d] != null)
+			let op = []
+			console.log("selected", selected)
+
+			if(selected == undefined && data != undefined){				
+				Object.keys(data).forEach((key)=> {
+					op.push({
+						name: key,
+						observations: data[key].observations,
+						users: data[key].users,
+						taxa: data[key].taxa,
+						locations: data[key].locations,
+						nmw: data[key].nmw.map(y => y-2000).join(", "),
+					})
+				})
+			} else if(selected == "region"){
+				let region = this.selected.region
+				let states = this.regional_data.find((d) => d[0] == region)[1].map((d) => d[0])
+				Object.keys(this.polygon_data.states).forEach((d) => {
+					if(states.indexOf(d) != -1){
+						op.push({
+							name: d,
+							observations: this.polygon_data.states[d].observations,
+							users: this.polygon_data.states[d].users,
+							taxa: this.polygon_data.states[d].taxa,
+							locations: this.polygon_data.states[d].locations,
+							nmw: this.polygon_data.states[d].nmw.map(y => y-2000).join(", "),
+						})
+					}
+				})
+			} else if(selected == "state"){
+				let region = this.geojson.states.features.find((d) => d.properties.state == this.selected.state).properties.region
+				let state = this.selected.state
+				let districts = this.regional_data.find((d) => d[0] == region)[1].find((d) => d[0] == state)[1].map((d) => d[0])
+				console.log(this.polygon_data.districts)
+				Object.keys(this.polygon_data.districts).forEach((d) => {
+					if(districts.indexOf(d) != -1){
+						op.push({
+							name: d,
+							observations: this.polygon_data.districts[d].observations,
+							users: this.polygon_data.districts[d].users,
+							taxa: this.polygon_data.districts[d].taxa,
+							locations: this.polygon_data.districts[d].locations,
+							nmw: this.polygon_data.districts[d].nmw.map(y => y-2000).join(", "),
+						})
+					}
+				})
+			}
+			return op
+		},
+		sortedData(){
+			let op = this.selectedData
+			if(this.data_mode != "nmw"){
+				if(this.sort_dir == "desc"){
+					op = op.sort((a, b) => b[this.data_mode] - a[this.data_mode])
+				} else {
+					op = op.sort((a, b) => a[this.data_mode] - b[this.data_mode])
 				}
-			} else if(this.selected.state){
-				op = {
-					state: this.regional_data.states.find((d) => d.state == this.selected.state),
-					districts: this.regional_data.districts.filter((d) => d.state == this.selected.state)
-				}
-			} else if(this.polygon_mode == "districts"){
-				op = {
-					districts: this.regional_data.districts
-				}
-			} else if(this.polygon_mode == "states"){
-				op = {
-					states: this.regional_data.states
-				}
-			} else if(this.polygon_mode == "regions"){
-				op = {
-					regions: this.regional_data.regions
+			} else {
+				if(this.sort_dir == "desc"){
+					op = op.sort((a, b) => b[this.data_mode].length - a[this.data_mode].length)
+				} else {
+					op = op.sort((a, b) => a[this.data_mode].length - b[this.data_mode].length)
 				}
 			}
 			return op
@@ -255,12 +388,25 @@ export default defineComponent({
 			return str ? str.charAt(0).toUpperCase() + str.slice(1) : ""
 		},
         color_polygon(polygon) {
-			let polygon_data = this.mapData.find((d) => d.name == polygon[this.polygon_key])
-			if(polygon_data){
-				return this.colors(polygon_data.value)
+			let name = ""
+			if(this.polygon_mode == "districts"){
+				name = polygon.district
+			} else if (this.polygon_mode == "states"){
+				name = polygon.state
+			} else {
+				name = polygon.region
 			}
-            return this.colors(0)
-			// 'hsl(100,10%, 75%)'
+			if(this.mapData){
+				let polygon_data = this.mapData[name]
+				if(polygon_data){
+					if(this.data_mode != 'nmw'){
+						return this.colors(polygon_data[this.data_mode])
+					} else {
+						return this.colors(polygon_data[this.data_mode].length)
+					}
+				}
+			}
+            return 'hsl(200,10%, 25%)'
         },
         handleZoom(e){
 			this.zoomTransform = e.transform
@@ -279,11 +425,11 @@ export default defineComponent({
 			this.path = null
 			this.svg = {}
 			this.height = window.innerHeight * 0.8
-			this.width = this.$refs.mapDiv.clientWidth * 0.65
+			this.width = this.$refs.mapDiv.clientWidth * 0.5
 			if(window.innerWidth < 800){
 				this.projection = d3.geoMercator().scale(600).center([110, 20])
 			} else {
-				this.projection = d3.geoMercator().scale(1200).center([80, 28])
+				this.projection = d3.geoMercator().scale(1000).center([85, 28])
 			}
 			this.path = d3.geoPath().projection(this.projection)
 			this.renderMap()
@@ -305,7 +451,16 @@ export default defineComponent({
 		init_legend() {
 			this.colors = {}
 			this.legend = {}
-			this.max = Math.max(...this.mapData.map((d) => d.value))
+			this.max = 0
+			if(this.data_mode != "nmw"){
+				Object.keys(this.mapData).forEach((key) => {
+					this.max = Math.max(this.max, this.mapData[key][this.data_mode])
+				})
+			} else {
+				Object.keys(this.mapData).forEach((key) => {
+					this.max = Math.max(this.max, this.mapData[key][this.data_mode].length)
+				})
+			}
 			
 			this.colors = d3.scaleLinear()
 				.domain([0, 1, this.max*.25, this.max])
@@ -350,25 +505,25 @@ export default defineComponent({
 			this.polygons = base.append("g")
 				.classed("polygons", true)
 			
-			this.json[this.polygon_mode].features.forEach((polygon) => {
+			this.geojson[this.polygon_mode].features.forEach((polygon) => {
 				this.drawPolygon(polygon)
-				if(this.polygon_mode != "districts"){
-					this.drawPolygonLabel(base_text, polygon)
-				}
+				// if(this.polygon_mode != "districts"){
+				// 	this.drawPolygonLabel(base_text, polygon)
+				// }
 			})
 			if(this.polygon_mode == "districts"){
-				this.json.states.features.forEach((polygon) => {
+				this.geojson.states.features.forEach((polygon) => {
 					this.drawPolygonBoundary(polygon)
 				})
 			} else if (this.polygon_mode == "states"){
-				this.json.regions.features.forEach((polygon) => {
+				this.geojson.regions.features.forEach((polygon) => {
 					this.drawPolygonBoundary(polygon)
 				})
 			}
 			
 			this.svg.append("g")
 				.attr("class", "legend")
-				.attr("transform", "translate("+this.width*.55+", 25)")
+				.attr("transform", "translate("+this.width*.45+", 25)")
 				.call(this.legend)
 			this.svg.call(this.zoom)
 
@@ -407,10 +562,16 @@ export default defineComponent({
 				.on("click", (d, polygon_details) => this.clicked(polygon_details))
 		},
 		drawPolygonLabel(base_text, polygon){
-			const polygon_data = this.regional_data[this.polygon_mode].find((d) => d[this.polygon_key] == polygon.properties[this.polygon_key])
+			let polygon_data = this.polygon_data[this.polygon_mode]
 			let data = ""
+			// if(Object.keys(polygon.properties) == 2){
+			// 	polygon_data = polygon_data[polygon.properties.state]
+			// } else {
+			// 	polygon_data = polygon_data[polygon.properties.region]
+			// }
+			
 			if(polygon_data){
-				data = this.format_number(polygon_data[this.data_mode])
+				data = this.format_number(polygon_data[polygon.properties.state][this.data_mode])
 			}
 			
 			base_text.append("g")
@@ -437,10 +598,17 @@ export default defineComponent({
 			
 		},
 		hover_text(properties){
-			const polygon_data = this.regional_data[this.polygon_mode].find((d) => d[this.polygon_key] == properties[this.polygon_key])
 			const {region, state, district} = properties || {}
-			const {observations, users, unique_taxa, species_count, unidentified} = polygon_data || {}
-			const tooltip_data = { region, state, district, observations, users, unique_taxa, species_count, unidentified}
+			let polygon_data = {}
+			if(this.polygon_mode == "districts"){
+				polygon_data = this.polygon_data[this.polygon_mode][district]
+			} else if (this.polygon_mode == "states"){
+				polygon_data = this.polygon_data[this.polygon_mode][state]
+			} else {
+				polygon_data = this.polygon_data[this.polygon_mode][region]
+			}
+			const {observations, users, taxa, locations, nmw} = polygon_data || {}
+			const tooltip_data = { region, state, district, observations, users, taxa, locations, nmw}
 			if(this.polygon_mode !== "districts"){
 				delete tooltip_data.district
 			}
@@ -476,7 +644,7 @@ export default defineComponent({
 		clicked(polygon_details) {
 			const {region, state, district}	= polygon_details.properties || {}
 			if(state){
-				this.json.states.features.find((p) => {
+				this.geojson.states.features.find((p) => {
 					if(p.properties.state == polygon_details.properties.state){
 						this.clicked_state(p)
 					}
@@ -494,6 +662,7 @@ export default defineComponent({
 			d3.selectAll(".current-state").classed("current-state", false)
 			d3.selectAll(".selected-polygon").classed("selected-polygon", false)
 			if(this.selected.region == null || this.selected.region != region){
+				
 				this.selected.region = region;
 				[[x0, y0], [x1, y1]] = this.path.bounds(polygon);
 				d3.select("#" + this.getPolygonId(polygon_details.properties)).classed("selected-polygon", true)
@@ -503,7 +672,7 @@ export default defineComponent({
 					state: null,
 					region: null
 				};
-				[[x0, y0], [x1, y1]] = this.path.bounds(regions);
+				[[x0, y0], [x1, y1]] = this.path.bounds(this.geojson.regions);
 			}
 			// this.selectArea()
 			
@@ -534,7 +703,7 @@ export default defineComponent({
 					state: null,
 					region: null
 				};
-				[[x0, y0], [x1, y1]] = this.path.bounds(regions);
+				[[x0, y0], [x1, y1]] = this.path.bounds(this.geojson.regions);
 			}
 			// this.selectArea()
 			
@@ -559,6 +728,21 @@ export default defineComponent({
 				this.dispatchSelectArea("state", this.selected_area) 
 			}
 		},
+		sortBy(col){
+			if(this.data_mode == col){
+				if(this.sort_dir == "desc"){
+					this.sort_dir = "asc"
+				} else {
+					this.sort_dir = "desc"
+				}
+			} else {
+				this.sort_dir = "desc"
+			}
+			this.data_mode = col
+		},
+		selectYear(year){
+			store.dispatch('setYear', year)
+		}
     }
 })
 </script>

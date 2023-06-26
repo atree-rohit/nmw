@@ -145,15 +145,17 @@ export default defineComponent({
     },
     computed:{
         type(){
-            let keys = Object.keys(this.table_data)
-            let op = ""
-            switch(keys.length){
-                case 3: op = "region"
-                    break
-                case 2: op = "state"
-                    break
-                case 1: op = "district"
-                    break
+            let op = "district"
+            if(this.table_data != undefined){
+                let keys = Object.keys(this.table_data)
+                switch(keys.length){
+                    case 3: op = "region"
+                        break
+                    case 2: op = "state"
+                        break
+                    case 1: op = "district"
+                        break
+                }
             }
             return op
         },
@@ -214,6 +216,7 @@ export default defineComponent({
                 geography = "districts"
             }
             op = `<b>${current}</b> of <b>${total}</b> ${geography} in the <u>${selected_geography}</u> have recorded observations during City Nature Challenge, 2023`
+            console.log("TD", this.table_data)
             if(Object.keys(this.table_data).length == 1){
                 op = `Select a region or state to view stats`
             }
