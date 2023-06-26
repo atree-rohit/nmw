@@ -75,22 +75,22 @@ const store = createStore({
         },
         async initObservations({ commit }) {
             // console.log("Init observations")
-            const observations = await axios.get("/observations")
+            const observations = await axios.get("/nmw/observations")
             commit("SET_OBSERVATIONS", observations.data)
         },
         async initTaxa({ commit }) {
             // console.log("Init taxa")
-            const taxa = await axios.get("/taxa")
+            const taxa = await axios.get("/nmw/taxa")
             commit("SET_TAXA", taxa.data)
         },
         async initUsers({ commit }) {
             // console.log("Init users")
-            const users = await axios.get("/users")
+            const users = await axios.get("/nmw/users")
             commit("SET_USERS", users.data)
         },
         async initLocations({ commit }) {
             // console.log("Init locations")
-            const locations = await axios.get("/locations")
+            const locations = await axios.get("/nmw/locations")
             commit("SET_LOCATIONS", locations.data)
         },
         async initExpandedData({ commit, state}) {
