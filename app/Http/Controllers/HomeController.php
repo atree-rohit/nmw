@@ -33,6 +33,7 @@ class HomeController extends Controller
             }
             return array_values($clean);
         }, $data->toArray());
+        file_put_contents(public_path("/data/observations.json"), json_encode($clean_data));
         return response()->json($clean_data);
     }
 

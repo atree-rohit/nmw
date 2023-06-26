@@ -75,7 +75,7 @@ const store = createStore({
         },
         async initObservations({ commit }) {
             // console.log("Init observations")
-            const observations = await axios.get("/nmw/observations")
+            const observations = await axios.get("/nmw/data/observations.json")
             commit("SET_OBSERVATIONS", observations.data)
         },
         async initTaxa({ commit }) {
