@@ -94,20 +94,20 @@ const store = createStore({
             commit("SET_LOCATIONS", locations.data)
         },
         async initExpandedData({ commit, state}) {
-            let ob_fields = ["id", "observed_on", "license", "image_url", "nmw", "user_id", "taxa_id", "location_id", "created_at", "updated_at"]
+            let ob_fields = ["id", "observed_on", "license",  "nmw", "user_id", "taxa_id", "location_id", "created_at", "updated_at"]
             let op = []
             op = state.observations.map((o) => {
                 let x = {}
                 ob_fields.forEach((f, k) => {
                     x[f] = o[k]
                 })
-                x.user_name = state.users[o[5]].name
-                x.user_login = state.users[o[5]].login
-                x.scientific_name = state.taxa[o[6]].name
-                x.common_name = state.taxa[o[6]].common_name
-                x.region = state.locations[o[7]].region
-                x.state = state.locations[o[7]].state
-                x.district = state.locations[o[7]].district
+                x.user_name = state.users[o[4]].name
+                x.user_login = state.users[o[4]].login
+                x.scientific_name = state.taxa[o[5]].name
+                x.common_name = state.taxa[o[5]].common_name
+                x.region = state.locations[o[6]].region
+                x.state = state.locations[o[6]].state
+                x.district = state.locations[o[6]].district
                 return x
             }).filter((o) => state.selected_years.includes(o.nmw))
             commit("SET_EXPANDED_DATA", op)
