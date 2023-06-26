@@ -22,7 +22,7 @@ class HomeController extends Controller
     }
 
     public function observations(){
-        $data = InatObservation::limit(-100)->get();
+        $data = InatObservation::limit(100)->get();
         $unset_fields = ["latitude", "longitude", "quality_grade", "oauth_application_id", "num_identification_agreements", "num_identification_disagreements", "inat_created_at", "inat_updated_at"];
         $clean_data = array_map(function($item) use (&$unset_fields){
             $clean = $item;
