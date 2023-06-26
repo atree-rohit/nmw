@@ -16,10 +16,10 @@ use App\Http\Controllers\ImportController;
 */
 
 Route::get('/', [HomeController::class, 'index']);
-Route::get('nmw/observations', [HomeController::class, 'observations']);
-Route::get('nmw/taxa', [HomeController::class, 'taxa']);
-Route::get('nmw/users', [HomeController::class, 'users']);
-Route::get('nmw/locations', [HomeController::class, 'locations']);
+Route::get('observations', [HomeController::class, 'observations']);
+Route::get('taxa', [HomeController::class, 'taxa']);
+Route::get('users', [HomeController::class, 'users']);
+Route::get('locations', [HomeController::class, 'locations']);
 
 // Route::get('import', [ImportController::class, 'import']);
 // Route::get('pull_data', [ImportController::class, 'pull_data']);
