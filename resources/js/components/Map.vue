@@ -524,7 +524,7 @@ export default defineComponent({
 			this.svg.append("g")
 				.attr("class", "legend")
 				.attr("transform", "translate("+this.width*.45+", 25)")
-				.call(this.legend)
+				.call(this.legend);
 			this.svg.call(this.zoom)
 
 			this.svg.call(this.zoom.transform, this.zoomTransform)
