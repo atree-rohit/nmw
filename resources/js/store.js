@@ -37,12 +37,16 @@ const store = createStore({
         },
         SET_EXPANDED_DATA(state, data){
             state.expanded_data = data
+            // ["id","observed_on","license","nmw","user_id","taxa_id","location_id","created_at","updated_at","user_name","user_login","scientific_name","common_name","region","state","district"]
+            // console.log("expanded data", Object.keys(state.expanded_data[0]))
         },
         SET_REGIONAL_DATA(state, regional_data) {
             state.regional_data = regional_data
+            // console.log("regional data", state.regional_data)
         },
         SET_POLYGON_DATA(state, polygon_data) {
             state.polygon_data = polygon_data
+            // console.log("polygon data", state.polygon_data)
         },
         SET_SELECTED_YEARS(state, year) {
             if (state.selected_years.includes(year)) {
@@ -53,7 +57,7 @@ const store = createStore({
         }
     },
     actions: {
-        async initData({ commit, dispatch }) {
+        async initData_1({ commit, dispatch }) {
             try {
                 await dispatch("initObservations")
                 await dispatch("initTaxa")
@@ -67,6 +71,20 @@ const store = createStore({
                 console.error("Initialization error: ", error)
             }
         },
+        async initData({ commit, dispatch }) {
+            try{
+                await dispatch("initJson")
+            } catch(error) {
+                console.error("Initialization error: ", error)
+            }
+        },
+        async initJson({ commit}) {
+            const regional_data = await axios.get("/data/regional_data.json")
+            const polygon_data = await axios.get("/data/polygon_data.json")
+            // const expanded_data = await axios.get("/data/expanded_data.json")
+            commit("SET_REGIONAL_DATA", regional_data.data)
+            commit("SET_POLYGON_DATA", polygon_data.data)
+        },
         async setYear({commit, dispatch}, year){
             commit("SET_SELECTED_YEARS", year)
             await dispatch("initExpandedData")
@@ -75,22 +93,22 @@ const store = createStore({
         },
         async initObservations({ commit }) {
             // console.log("Init observations")
-            const observations = await axios.get("/nmw/data/observations.json")
+            const observations = await axios.get("/data/observations.json")
             commit("SET_OBSERVATIONS", observations.data)
         },
         async initTaxa({ commit }) {
             // console.log("Init taxa")
-            const taxa = await axios.get("/nmw/taxa")
+            const taxa = await axios.get("/taxa")
             commit("SET_TAXA", taxa.data)
         },
         async initUsers({ commit }) {
             // console.log("Init users")
-            const users = await axios.get("/nmw/users")
+            const users = await axios.get("/users")
             commit("SET_USERS", users.data)
         },
         async initLocations({ commit }) {
             // console.log("Init locations")
-            const locations = await axios.get("/nmw/locations")
+            const locations = await axios.get("/locations")
             commit("SET_LOCATIONS", locations.data)
         },
         async initExpandedData({ commit, state}) {
