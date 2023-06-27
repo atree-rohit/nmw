@@ -79,8 +79,8 @@ const store = createStore({
             }
         },
         async initJson({ commit}) {
-            const regional_data = await axios.get("/nmw/data/regional_data.json")
-            const polygon_data = await axios.get("/nmw/data/polygon_data.json")
+            const regional_data = await axios.get("/data/regional_data.json")
+            const polygon_data = await axios.get("/data/polygon_data.json")
             // const expanded_data = await axios.get("/data/expanded_data.json")
             commit("SET_REGIONAL_DATA", regional_data.data)
             commit("SET_POLYGON_DATA", polygon_data.data)
