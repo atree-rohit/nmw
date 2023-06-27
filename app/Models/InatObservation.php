@@ -22,6 +22,8 @@ class InatObservation extends Model
         "num_identification_agreements",
         "num_identification_disagreements",
         "oauth_application_id",
+        "nmw",
+        "butterfly",
         "user_id",
         "taxa_id",
         "location_id",

@@ -16,14 +16,25 @@ use App\Models\InatLocation;
 
 class HomeController extends Controller
 {
+    public function index_x(){
+        $observations = InatObservation::with("taxa")->where("butterfly", false)->get();
+        $butterflies = [];
+        foreach($observations as $o){
+            if(substr($o->taxa->ancestry, 0, 45)=="48460/1/47120/372739/47158/184884/47157/47224"){
+                $o->butterfly = true;
+                $o->save();
+            } 
+        }
+        dd(count($butterflies));
+    }
     public function index(){
         return view("welcome");
         
     }
 
     public function observations(){
-        $data = InatObservation::limit(-100)->get();
-        $unset_fields = ["latitude", "longitude", "quality_grade", "oauth_application_id", "num_identification_agreements", "num_identification_disagreements", "image_url", "inat_created_at", "inat_updated_at"];
+        $data = InatObservation::where("butterfly", false)->limit(-100)->get();
+        $unset_fields = ["latitude", "longitude", "quality_grade", "oauth_application_id", "num_identification_agreements", "num_identification_disagreements", "image_url", "butterfly", "inat_created_at", "inat_updated_at"];
         $clean_data = array_map(function($item) use (&$unset_fields){
             $clean = $item;
             $clean["created_at"] = date("Y-m-d", strtotime($item["inat_created_at"]));
