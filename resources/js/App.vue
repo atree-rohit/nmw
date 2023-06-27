@@ -1,13 +1,19 @@
+<style>
+    html, body, #app {
+        height: 100%;
+        width: 100%;
+        margin: 0;
+        padding: 0;
+        font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif;
+    }
+    *{
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+    }
+</style>
 <template>
-    <div>
-        <!-- <pre>
-            {{ expandedData }}
-        </pre>
-        <pre>
-            {{ polygonData }}
-        </pre> -->
-        <Map />
-    </div>
+    <Map />
 </template>
 
 <script lang="ts">
@@ -22,12 +28,6 @@
             Map
         },
         computed:{
-            polygonData() {
-                return this.$store.getters.polygon_data
-            },
-            expandedData() {
-                return this.$store.getters.expanded_data
-            },
         },
         watch:{
         },

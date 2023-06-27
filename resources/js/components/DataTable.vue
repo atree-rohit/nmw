@@ -1,4 +1,4 @@
-<style>
+<style scoped>
 .overall-data{
     background:black;
     color:green;

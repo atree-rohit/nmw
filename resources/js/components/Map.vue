@@ -123,20 +123,27 @@
 	}
     table{
 		border-collapse: collapse;
+		width: 100%;
 	}
-	th,td{
-        border: 1px solid white;
-    }
+	
 	th{
 		white-space: nowrap;
+		background: #333;
+		color: #eee;
+		padding: .5rem .5rem;
 		border: 1px solid #555;
 		cursor: pointer;
 	}
-    td {
+    tr td {
         padding: 0.5rem 1rem;
+		border-top: 1px solid rgba(30, 60, 60, .25);
     }
 	tbody tr:hover td{
 		background: #ffa;
+	}
+	tr.no-data td{
+		background: #eaa;
+		color: #f00;
 	}
 	@media screen and (max-width: 800px) {
 		.poly_text{
@@ -219,7 +226,11 @@
 						</tr>
 					</thead>
 					<tbody>
-						<tr v-for="(row, k) in sortedData" :key="k">
+						<tr
+							v-for="(row, k) in sortedData"
+							:key="k"
+							:class="{'no-data': row.observations == 0}"
+						>
 							<td v-text="row.name"/>
 							<td v-text="row.observations"/>
 							<td v-text="row.users"/>
@@ -308,10 +319,12 @@ export default defineComponent({
 			let data = this.polygon_data[this.polygon_mode]
 			let selected = Object.keys(this.selected).find((d) => this.selected[d] != null)
 			let op = []
-			console.log("selected", selected)
+			// console.log("selected", selected, data)
 
-			if(selected == undefined && data != undefined){				
+			if(selected == undefined && data != undefined){
+				let added_districts = []
 				Object.keys(data).forEach((key)=> {
+					added_districts.push(key)
 					op.push({
 						name: key,
 						observations: data[key].observations,
@@ -321,6 +334,20 @@ export default defineComponent({
 						nmw: data[key].nmw.map(y => y-2000).join(", "),
 					})
 				})
+				if(this.polygon_mode == "districts"){
+					this.geojson.districts.features.forEach((d) => {
+						if(added_districts.indexOf(d.properties.district) == -1){
+							op.push({
+								name: d.properties.district,
+								observations: 0,
+								users: 0,
+								taxa: 0,
+								locations: 0,
+								nmw: "",
+							})
+						}
+					})
+				}
 			} else if(selected == "region"){
 				let region = this.selected.region
 				let states = this.regional_data.find((d) => d[0] == region)[1].map((d) => d[0])
@@ -340,9 +367,10 @@ export default defineComponent({
 				let region = this.geojson.states.features.find((d) => d.properties.state == this.selected.state).properties.region
 				let state = this.selected.state
 				let districts = this.regional_data.find((d) => d[0] == region)[1].find((d) => d[0] == state)[1].map((d) => d[0])
-				console.log(this.polygon_data.districts)
+				let added_districts = []
 				Object.keys(this.polygon_data.districts).forEach((d) => {
 					if(districts.indexOf(d) != -1){
+						added_districts.push(d)
 						op.push({
 							name: d,
 							observations: this.polygon_data.districts[d].observations,
@@ -350,6 +378,18 @@ export default defineComponent({
 							taxa: this.polygon_data.districts[d].taxa,
 							locations: this.polygon_data.districts[d].locations,
 							nmw: this.polygon_data.districts[d].nmw.map(y => y-2000).join(", "),
+						})
+					}
+				})
+				this.geojson.districts.features.forEach((d) => {
+					if(added_districts.indexOf(d.properties.district) == -1 && d.properties.state == state){
+						op.push({
+							name: d.properties.district,
+							observations: 0,
+							users: 0,
+							taxa: 0,
+							locations: 0,
+							nmw: "",
 						})
 					}
 				})
