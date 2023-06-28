@@ -21,6 +21,7 @@ const store = createStore({
         regional_data: [],
         polygon_data: [],
         selected_years: [2012,2013,2014,2015,2016,2017,2018,2019,2020,2021,2022],
+        nmw: [],
     },
     mutations: {
         SET_OBSERVATIONS(state, observations) {
@@ -37,8 +38,6 @@ const store = createStore({
         },
         SET_EXPANDED_DATA(state, data){
             state.expanded_data = data
-            // ["id","observed_on","license","nmw","user_id","taxa_id","location_id","created_at","updated_at","user_name","user_login","scientific_name","common_name","region","state","district"]
-            // console.log("expanded data", Object.keys(state.expanded_data[0]))
         },
         SET_REGIONAL_DATA(state, regional_data) {
             state.regional_data = regional_data
@@ -54,6 +53,9 @@ const store = createStore({
             } else {
                 state.selected_years.push(year)
             }
+        },
+        SET_NMW(state, nmw) {
+            state.nmw = nmw
         }
     },
     actions: {
@@ -71,9 +73,10 @@ const store = createStore({
                 console.error("Initialization error: ", error)
             }
         },
-        async initData({ commit, dispatch }) {
+        async initData({ dispatch }) {
             try{
                 await dispatch("initJson")
+                await dispatch("initNMW")
             } catch(error) {
                 console.error("Initialization error: ", error)
             }
@@ -81,9 +84,27 @@ const store = createStore({
         async initJson({ commit}) {
             const regional_data = await axios.get("/data/regional_data.json")
             const polygon_data = await axios.get("/data/polygon_data.json")
-            // const expanded_data = await axios.get("/data/expanded_data.json")
+            const expanded_data = await axios.get("/data/expanded_data.json")
             commit("SET_REGIONAL_DATA", regional_data.data)
             commit("SET_POLYGON_DATA", polygon_data.data)
+            commit("SET_EXPANDED_DATA", expanded_data.data)
+        },
+        async initNMW({commit, state}){
+            let nmw_data = Object.fromEntries(d3.group(state.expanded_data, d => d[3]).entries())
+            let nmw = []
+            console.log(state.expanded_data[0])
+            Object.keys(nmw_data).forEach((y) => {
+                let row = {
+                    year: y,
+                    observations: nmw_data[y].length,
+                    states: [...new Set(nmw_data[y].map(d => d[14]))].length,
+                    districts:[...new Set(nmw_data[y].map(d => d[15]))].length,
+                    locations: [...new Set(nmw_data[y].map(d => d[6]))].length,
+                    unique_taxa: [...new Set(nmw_data[y].map(d => d[5]))].length,
+                }
+                nmw.push(row)
+            })
+            commit("SET_NMW", nmw)
         },
         async setYear({commit, dispatch}, year){
             commit("SET_SELECTED_YEARS", year)

@@ -11,9 +11,52 @@
         padding: 0;
         box-sizing: border-box;
     }
+
+	.switcher{
+        display: flex;
+		flex-wrap: wrap;
+        justify-content: center;
+        align-items: center;
+		margin: .25rem;
+	}
+	.switcher .btn{
+		font-size: 0.9rem;
+		cursor: pointer;
+		border-radius: 0 0 0 0;
+		border: 1px solid #aaa;
+		padding: .25rem 1rem;
+		
+	}
+	.switcher .btn:first-child{
+		border-radius: 1rem  0 0 1rem;
+	}
+	.switcher .btn:last-child{
+		border-radius: 0 1rem 1rem 0;
+	}
+	.switcher .btn.selected{
+		background: green;
+		color:white;
+	}
+    @media screen and (max-width: 800px) {
+		.switcher .btn{
+			font-size:.7rem;
+			padding: .125rem 0.5rem;
+		}
+	}
 </style>
 <template>
-    <Map />
+    <div class="switcher switcher-sm">
+        <button
+            class="btn"
+            v-for="p in pages"
+            :key="p"
+            :class="{'selected': p === selected_page}"
+            @click="selected_page = p"
+            v-text="p"
+        />
+    </div>
+    <nmw-table v-if="selected_page == 'nmw'"/>
+    <Map v-else-if="selected_page == 'map'" :key="map_key"/>
 </template>
 
 <script lang="ts">
@@ -21,18 +64,33 @@
     import {mapState} from 'vuex'
     import store from './store'
     import Map from './components/Map.vue'
+    import NmwTable from './components/NmwTable.vue'
 
     export default defineComponent({
         name: "App",
         components: {
-            Map
+            Map, 
+            NmwTable
+        },
+        data() {
+            return {
+                pages: ["nmw", "map", "taxa"],
+                selected_page: "nmw",
+                map_key: 1,
+            }
         },
         computed:{
         },
         watch:{
+            selected_page(){
+                this.map_key++
+            }
         },
         created() {
-            // store.dispatch("initData")
+            store.dispatch("initData")            
         },
+        methods:{
+            
+        }
     })
 </script>
