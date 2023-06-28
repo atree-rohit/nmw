@@ -1,40 +1,10 @@
 <style>
-	.switcher-sm .btn{
-		font-size: 0.9rem !important;
-	}
 	#map{
 		display: flex;
 		justify-content: space-around;
+		margin: 0 .5rem;
 	}
-	.map-controls{
-		display: grid;
-		grid-template-rows: 1fr 1fr;
-	}
-	.map-controls .switcher{
-		display: flex;
-		justify-content: center;
-		align-items: center;
-	}
-	.switcher{
-		margin: .25rem;
-	}
-	.switcher .btn{
-		cursor: pointer;
-		border-radius: 0 0 0 0;
-		border: 1px solid #aaa;
-		padding: .25rem 1rem;
-		
-	}
-	.switcher .btn:first-child{
-		border-radius: 1rem  0 0 1rem;
-	}
-	.switcher .btn:last-child{
-		border-radius: 0 1rem 1rem 0;
-	}
-	.switcher .btn.selected{
-		background: green;
-		color:white;
-	}
+	
 	#map #map-stats{
 		border: 1px solid pink;
 		width: 50%;
@@ -138,6 +108,9 @@
         padding: 0.5rem 1rem;
 		border-top: 1px solid rgba(30, 60, 60, .25);
     }
+	tr:nth-child(even) {
+        background-color: #e0e0e0;
+    }
 	tbody tr:hover td{
 		background: #ffa;
 	}
@@ -145,9 +118,25 @@
 		background: #eaa;
 		color: #f00;
 	}
+	td.small-td{
+		font-size: .67rem;
+	}
 	@media screen and (max-width: 800px) {
 		.poly_text{
 			font-size: 3.5vw;
+		}
+		#map{
+			flex-direction: column;
+		}
+		tr td {
+			padding: 0.125rem;
+		}
+		#map #map-stats{
+			width: 100%;
+			margin: 0.25rem;
+			max-height: 40vh;
+			overflow:scroll;
+			font-size:.75rem;
 		}
 	}
 </style>
@@ -236,7 +225,7 @@
 							<td v-text="row.users"/>
 							<td v-text="row.taxa"/>
 							<td v-text="row.locations"/>
-							<td v-text="row.nmw"/>
+							<td class="small-td" v-text="row.nmw"/>
 						</tr>						
 					</tbody>
 				</table>
@@ -283,16 +272,18 @@ export default defineComponent({
 			height: 0,
 			width: 0,
 			tooltip:null,
+			legend_offset: 0,
         }
     },
 	created(){
-		console.clear()
-		store.dispatch("initData")
+		// console.clear()
 		console.log("Map")
 		this.init_tooltip()
 	},
     mounted(){
-		// this.init()
+		if(Object.keys(this.polygon_data).length){
+			this.init()
+		}
 		// if(this.regional_data.length > 0){
 		// }
     },
@@ -307,8 +298,7 @@ export default defineComponent({
 		},
 		data_mode(){
 			this.renderMap()
-		}
-
+		},
 	},
     computed:{
         ...mapState(["geojson", "regional_data", "polygon_data", "selected_years"]),
@@ -464,11 +454,15 @@ export default defineComponent({
 			this.polygons = null
 			this.path = null
 			this.svg = {}
-			this.height = window.innerHeight * 0.8
-			this.width = this.$refs.mapDiv.clientWidth * 0.5
 			if(window.innerWidth < 800){
-				this.projection = d3.geoMercator().scale(600).center([110, 20])
+				this.height = window.innerHeight * 0.5
+				this.width = this.$refs.mapDiv.clientWidth
+				this.legend_offset = this.width * .25
+				this.projection = d3.geoMercator().scale(500).center([115, 17.5])
 			} else {
+				this.height = window.innerHeight * 0.8
+				this.width = this.$refs.mapDiv.clientWidth * 0.5
+				this.legend_offset = this.width * .25
 				this.projection = d3.geoMercator().scale(1000).center([85, 28])
 			}
 			this.path = d3.geoPath().projection(this.projection)
@@ -506,7 +500,19 @@ export default defineComponent({
 				.domain([0, 1, this.max*.25, this.max])
 				.range(["#f77", "#ca0", "#ada", "#3d3"])
 				.clamp(true)
-			this.legend = d3Legend.legendColor()
+			
+			if(window.innerWidth < 800){
+				this.legend = d3Legend.legendColor()
+								.shapeHeight(20)
+								.shapeWidth(60)
+								.scale(this.colors)
+								.labelFormat(d3.format(",.0f"))
+								.orient('horizontal')
+								.labelOffset(-10)
+								.labelAlign("middle")
+								.cells(4)
+			} else {
+				this.legend = d3Legend.legendColor()
 								.shapeHeight(20)
 								.shapeWidth(60)
 								.scale(this.colors)
@@ -515,6 +521,7 @@ export default defineComponent({
 								.labelOffset(-10)
 								.labelAlign("middle")
 								.cells(6)
+			}
 		},			
 		renderMap () {
 			this.init_legend()
@@ -563,7 +570,7 @@ export default defineComponent({
 			
 			this.svg.append("g")
 				.attr("class", "legend")
-				.attr("transform", "translate("+this.width*.45+", 25)")
+				.attr("transform", "translate("+this.legend_offset+", 25)")
 				.call(this.legend);
 			this.svg.call(this.zoom)
 
