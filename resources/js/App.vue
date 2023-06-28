@@ -55,8 +55,9 @@
             v-text="p"
         />
     </div>
-    <nmw-table v-if="selected_page == 'nmw'"/>
-    <Map v-else-if="selected_page == 'map'" :key="map_key"/>
+    <nmw-table v-if="selected_page == 'NMW'"/>
+    <Map v-else-if="selected_page == 'Map'" :key="map_key"/>
+    <species-sunburst v-else-if="selected_page == 'taxa'"/>
 </template>
 
 <script lang="ts">
@@ -65,17 +66,19 @@
     import store from './store'
     import Map from './components/Map.vue'
     import NmwTable from './components/NmwTable.vue'
+    import SpeciesSunburst from './components/SpeciesSunburst.vue'
 
     export default defineComponent({
         name: "App",
         components: {
             Map, 
-            NmwTable
+            NmwTable,
+            SpeciesSunburst
         },
         data() {
             return {
-                pages: ["nmw", "map", "taxa"],
-                selected_page: "nmw",
+                pages: ["NMW", "Map"],
+                selected_page: "Map",
                 map_key: 1,
             }
         },

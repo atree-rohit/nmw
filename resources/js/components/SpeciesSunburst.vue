@@ -87,7 +87,7 @@
 <script lang="js">
 	import * as d3 from "d3"
 	export default {
-		name:"species-sunburst",
+		name:"SpeciesSunburst",
 		props: ["tree_data", "selected"],
 		data(){
 			return {
