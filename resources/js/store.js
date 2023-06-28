@@ -82,9 +82,9 @@ const store = createStore({
             }
         },
         async initJson({ commit}) {
-            const regional_data = await axios.get("/data/regional_data.json")
-            const polygon_data = await axios.get("/data/polygon_data.json")
-            const expanded_data = await axios.get("/data/expanded_data.json")
+            const regional_data = await axios.get("/nmw/data/regional_data.json")
+            const polygon_data = await axios.get("/nmw/data/polygon_data.json")
+            const expanded_data = await axios.get("/nmw/data/expanded_data.json")
             commit("SET_REGIONAL_DATA", regional_data.data)
             commit("SET_POLYGON_DATA", polygon_data.data)
             commit("SET_EXPANDED_DATA", expanded_data.data)
@@ -92,7 +92,6 @@ const store = createStore({
         async initNMW({commit, state}){
             let nmw_data = Object.fromEntries(d3.group(state.expanded_data, d => d[3]).entries())
             let nmw = []
-            console.log(state.expanded_data[0])
             Object.keys(nmw_data).forEach((y) => {
                 let row = {
                     year: y,
@@ -114,7 +113,7 @@ const store = createStore({
         },
         async initObservations({ commit }) {
             // console.log("Init observations")
-            const observations = await axios.get("/data/observations.json")
+            const observations = await axios.get("/nmw/data/observations.json")
             commit("SET_OBSERVATIONS", observations.data)
         },
         async initTaxa({ commit }) {
