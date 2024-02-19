@@ -68,8 +68,7 @@ class InatObservationController extends Controller
             }
             foreach($locations as $level => $level_values){
                 foreach($level_values as $value){
-                    foreach($year_observations)
-                    dd($x);
+                    
                     dd($level, $level_values);
                 }
 
