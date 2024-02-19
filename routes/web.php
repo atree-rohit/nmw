@@ -3,6 +3,7 @@
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\HomeController;
 use App\Http\Controllers\ImportController;
+use App\Http\Controllers\InatObservationController;
 
 /*
 |--------------------------------------------------------------------------
@@ -21,7 +22,8 @@ Route::get('taxa', [HomeController::class, 'taxa']);
 Route::get('users', [HomeController::class, 'users']);
 Route::get('locations', [HomeController::class, 'locations']);
 
-// Route::get('import', [ImportController::class, 'import']);
+Route::get('import', [ImportController::class, 'import']);
+Route::get('clean', [InatObservationController::class, 'clean']);
 // Route::get('pull_data', [ImportController::class, 'pull_data']);
 
 // Route::post('add_data', [ImportController::class, 'add_data']);
