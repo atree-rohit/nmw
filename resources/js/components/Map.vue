@@ -275,7 +275,7 @@ export default defineComponent({
         }
     },
 	created(){
-		console.clear()
+		// console.clear()
 		store.dispatch("initData")
 		console.log("Map")
 		this.init_tooltip()
