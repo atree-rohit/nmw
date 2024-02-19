@@ -12,6 +12,31 @@ class InatObservationController extends Controller
 {
     public function clean()
     {
+        ini_set('max_execution_time', 300);
+        $grouped_observations = INatObservation::where("nmw", "<>", null)->limit(-1)->get()->groupBy("taxa_id");
+        $count = [
+            "taxa" => 0,
+            "observations" => 0
+        ];
+        // dd($grouped_observations);
+        foreach($grouped_observations as $taxa_id => $observations){
+            $taxa = $observations->first()->taxa;
+            if(strpos($taxa->ancestry, "47224")){
+                $count["taxa"]++;
+                $observations->each(function ($observation) use (&$count) {
+                    $observation->nmw = null;
+                    $observation->save();
+                    $count["observations"]++;
+                });
+            }
+        }
+        dd($count);
+
+    }
+
+    
+    public function generate_data_json()
+    {
         $nmw_dates = file_get_contents(public_path("data/nmw_dates.json"));
         $dates_obj = json_decode($nmw_dates, true);
 
@@ -22,76 +47,119 @@ class InatObservationController extends Controller
         
         $observations = InatObservation::with(["user", "taxa", "location"])->where("nmw", "<>", null)->limit(-1)->get();
         $data = [];
-        foreach ($observations->groupBy("nmw") as $year => $year_observations) {
-            $all_users = $year_observations->groupBy("user_id");
-            $all_taxa = $year_observations->groupBy("taxa_id");
-            $all_locations = $year_observations->groupBy("location_id");
-            
-            $count_users = [];
-            foreach($all_users as $user_observations) {
-                $user = $user_observations->first()->user;
-                $count_users[$user->id] = [
-                    "name" => $user->name,
-                    "login" => $user->login,
-                    "observations" =>count($user_observations)
-                ];
-            }
-
-            $count_taxa = [];
-            foreach($all_taxa as $taxa_observations){
-                $taxa = $taxa_observations->first()->taxa;
-                if(!isset($count_taxa[$taxa->rank])){
-                    $count_taxa[$taxa->rank] = count($taxa_observations);
-                } else {
-                    $count_taxa[$taxa->rank] += count($taxa_observations);
-                }
-                
-            }
-
-            $locations = [
-                "regions" => [],
-                "states" => [],
-                "districts" => []
-            ];
-            $count_locations = [];
-            foreach($all_locations as $location_observations){
-                $location = $location_observations->first()->location;
-                if(!in_array($location->region, $locations["regions"])){
-                    $locations["regions"][] = $location->region;
-                }
-                if(!in_array($location->state, $locations["states"])){
-                    $locations["states"][] = $location->state;
-                }
-                if(!in_array($location->district, $locations["districts"])){
-                    $locations["districts"][] = $location->district;
-                }
-            }
-            foreach($locations as $level => $level_values){
-                foreach($level_values as $value){
-                    
-                    dd($level, $level_values);
-                }
-
-            }
-
-            
-            
-            $data[$year] = [
-                "total_observations" => count($year_observations),
-                "total_taxa" => count($all_taxa),
-                "count_taxa" => $count_taxa,
-                // "total_users" => count($all_users),
-                // "count_users" => $count_users
-                "count_locations" => $count_locations
-
-            ];
+        
+        foreach ($observations->groupBy("nmw") as $year => $year_observations) {    
+            $data[$year] = $this->getYearStats($year_observations);
         }
-        echo "<pre>";
-        print_r($data);
-        echo "</pre>";
-        dd($data);
+        file_put_contents(public_path("data/nmw_data_2012_to_2023.json"), json_encode($data));
+        return response()->json("JSON Set Successful", 200);
 
     }
+
+    private function getYearStats($observations)
+    {
+        return [
+            "total_observations" => $observations->count(),
+            "total_taxa" => $observations->groupBy("taxa_id")->count(),
+            "count_id_levels" => $this->getIDLevelsCount($observations),
+            "total_users" => $observations->groupBy("user_id")->count(),
+            "count_users" => $this->getUsersCount($observations),
+            "locations" => $this->getLocationsCount($observations),
+            "dates" => $this->getDatesCount($observations),
+        ];
+    }
+
+    private function getIDLevelsCount($observations)
+    {
+        $counts = [];
+        foreach($observations->groupBy("taxa_id") as $taxa_observations){
+            $taxa = $taxa_observations->first()->taxa;
+            if(!isset($counts[$taxa->rank])){
+                $counts[$taxa->rank] = [
+                    "total_taxa" => 0,
+                    "total_observations" => 0,
+                    "species" => []
+                ];
+            }
+            $counts[$taxa->rank]["total_taxa"]++;
+            $counts[$taxa->rank]["total_observations"] += $taxa_observations->count();
+            $counts[$taxa->rank]["species"][] = [
+                "id" => $taxa->id,
+                "scientific_name" => $taxa->scientific_name,
+                "common_name" => $taxa->common_name,
+                "ancestry" => $taxa->ancestry,
+                "observations" => $taxa_observations->count()
+            ];
+
+        }
+        return $counts;
+
+    }
+
+    private function getUsersCount($observations)
+    {
+        $count = [];
+        foreach($observations->groupBy("user_id") as $user_observations){
+            $user = $user_observations->first()->user;
+            $count[$user->id] = [
+                "name" => $user->name,
+                "login" => $user->login,
+                "observations" => $user_observations->count()
+            ];
+        }
+        return $count;
+    }
+
+    private function getLocationsCount($observations)
+    {
+        $locations_array = [];
+        $count = [];
+        foreach($observations->groupBy("location_id") as $location_observations){
+            $location = $location_observations->first()->location;
+            if(!isset($locations_array[$location->region])){
+                $locations_array[$location->region] = [];
+            }
+
+            if(!isset($locations_array[$location->region][$location->state])){
+                $locations_array[$location->region][$location->state] = [];
+            } 
+
+            if(!isset($locations_array[$location->region][$location->state][$location->district])){
+                $locations_array[$location->region][$location->state][$location->district] = $location_observations->toArray();
+            } 
+        }
+        
+        foreach($locations_array as $region => $states){
+            $count[$region] = ["region_total" => 0];
+            foreach($states as $state => $districts){
+                $count[$region][$state] = ["state_total" => 0];
+                foreach($districts as $district => $observations){
+                    $no_of_observations = count($observations);
+                    $count[$region]["region_total"] += $no_of_observations;
+                    $count[$region][$state]["state_total"] += $no_of_observations;
+                    $count[$region][$state][$district] = $no_of_observations;
+                }
+            }
+        }
+        return $count;
+    }
+
+    private function getDatesCount($observations)
+    {
+        $count = [];
+        foreach($observations->groupBy("observed_on") as $date_observations){
+            $count[$date_observations->first()->observed_on] = $date_observations->count();
+        }
+        return $count;
+    }
+
+
+
+
+
+
+
+
 
 
 
