@@ -27,3 +27,20 @@ Route::get('clean', [InatObservationController::class, 'clean']);
 // Route::get('pull_data', [ImportController::class, 'pull_data']);
 
 // Route::post('add_data', [ImportController::class, 'add_data']);
+
+Route::get('/nmw_data', function () {
+    $path = public_path('data/nmw_data_2012_to_2023.json');
+
+    if (!file_exists($path)) {
+        return Response::json(['error' => 'Data file not found'], 404);
+    }
+
+    // Read the contents of the JSON file
+    $data = file_get_contents($path);
+
+    // Decode the JSON data
+    // $jsonData = json_decode($data);
+
+    // Return the JSON response
+    return response()->json($data);
+});
