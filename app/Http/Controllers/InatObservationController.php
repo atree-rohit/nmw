@@ -51,6 +51,7 @@ class InatObservationController extends Controller
         foreach ($observations->groupBy("nmw") as $year => $year_observations) {    
             $data[$year] = $this->getYearStats($year_observations);
         }
+        // dd($data);
         file_put_contents(public_path("data/nmw_data_2012_to_2023.json"), json_encode($data));
         return response()->json("JSON Set Successful", 200);
 
@@ -76,13 +77,13 @@ class InatObservationController extends Controller
             $taxa = $taxa_observations->first()->taxa;
             if(!isset($counts[$taxa->rank])){
                 $counts[$taxa->rank] = [
-                    "total_taxa" => 0,
-                    "total_observations" => 0,
+                    "taxa" => 0,
+                    "observations" => 0,
                     "species" => []
                 ];
             }
-            $counts[$taxa->rank]["total_taxa"]++;
-            $counts[$taxa->rank]["total_observations"] += $taxa_observations->count();
+            $counts[$taxa->rank]["taxa"]++;
+            $counts[$taxa->rank]["observations"] += $taxa_observations->count();
             $counts[$taxa->rank]["species"][] = [
                 "id" => $taxa->id,
                 "scientific_name" => $taxa->scientific_name,
@@ -148,7 +149,22 @@ class InatObservationController extends Controller
     {
         $count = [];
         foreach($observations->groupBy("observed_on") as $date_observations){
-            $count[$date_observations->first()->observed_on] = $date_observations->count();
+            $taxa = [];
+            $users = [];
+            foreach($date_observations as $o){
+                if(!in_array($o->taxa_id, $taxa)){
+                    $taxa[] = $o->taxa_id;
+                }
+                if(!in_array($o->user_id, $users)){
+                    $users[] = $o->user_id;
+                }
+            }
+            
+            $count[$date_observations->first()->observed_on] = [
+                "observations"=> $date_observations->count(),
+                "taxa" => count($taxa),
+                "users" => count($users),
+            ];
         }
         return $count;
     }

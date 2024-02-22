@@ -16,7 +16,7 @@ import { useStore } from "vuex";
 const store = useStore();
 
 onMounted(() => {
-    console.clear();
+    // console.clear();
     store.dispatch("initData");
 });
 </script>

@@ -13,12 +13,12 @@ const store = createStore({
             states: states,
             regions: regions
         },
-        nmw_data: [],
+        nmw_data: {},
     },
     mutations: {
         SET_NMW_DATA(state, nmw_data) {
             state.nmw_data = nmw_data
-        },
+        }
     },
     actions: {
         async initData({ commit, dispatch }) {
@@ -39,7 +39,7 @@ const store = createStore({
             const observations = await axios.get("/nmw_data")
             
             commit("SET_NMW_DATA", JSON.parse(observations.data))
-        },
+        }
     },
     //Observations fields ["id", "observed_on", "license", "image_url", "nmw", "user_id", "taxa_id", "location_id", "created_at", "updated_at"]
     getters: {
