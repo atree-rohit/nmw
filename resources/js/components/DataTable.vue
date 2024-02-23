@@ -2,19 +2,11 @@
 
 <template>
     <div>
-        <div class="d-flex flex-wrap justify-content-around">
-            <id-level-chart :year="2012" />
-            <id-level-chart :year="2013" />
-            <id-level-chart :year="2014" />
-            <id-level-chart :year="2015" />
-            <id-level-chart :year="2016" />
-            <id-level-chart :year="2017" />
-            <id-level-chart :year="2018" />
-            <id-level-chart :year="2019" />
-            <id-level-chart :year="2020" />
-            <id-level-chart :year="2021" />
-            <id-level-chart :year="2022" />
-            <id-level-chart :year="2023" />
+        <div
+            class="d-flex flex-wrap justify-content-around container-fluid p-3"
+        >
+            <!-- <year-card v-for="index in 12" :key="index" :year="index + 2011" /> -->
+            <year-card v-for="year in years" :key="year" :year="year" />
         </div>
         <table class="table border border-danger">
             <thead class="table-danger">
@@ -62,10 +54,16 @@ import DataTableTaxaLevels from "./DataTableTaxaLevels.vue";
 import DataTableLocations from "./DataTableLocations.vue";
 import DataTableDates from "./DataTableDates.vue";
 import IdLevelChart from "./IdLevelChart.vue";
+import YearCard from "./YearCard.vue";
 
-// Destructure the initData action from the store
 const store = useStore();
 
 const geojson = computed(() => store.state.geojson);
 const nmw_data = computed(() => store.state.nmw_data);
+const startYear = 2022;
+const endYear = 2023;
+const years = Array.from(
+    Array(endYear - startYear + 1),
+    (_, index) => startYear + index
+);
 </script>
