@@ -1,238 +1,239 @@
 <style>
-	#map{
-		display: flex;
-		justify-content: space-around;
-		margin: 0 .5rem;
-	}
-	
-	#map #map-stats{
-		border: 1px solid pink;
-		width: 50%;
-		margin: 0 5px;
-		max-height: 80vh;
-		overflow:scroll;
-	}
-	#map-container {
-		display:flex;
-		justify-content: center;
-	}
-	.map-boundary path.state-boundary{
-		stroke-linejoin: round;
-		stroke-width: 0.5;
-		stroke:rgba(0, 0, 0, 1);
-		fill: none;
-	}
-	.map-boundary path:not(.state-boundary){
-		stroke-linejoin: round;
-		stroke-width: .25;
-		stroke:rgba(0, 0, 0, 0.5);
-	}
-	.map-boundary path:not(.state-boundary):hover{
-		cursor: pointer;
-		fill: beige;
-	}
-	.map-boundary .current-state{
-		stroke: rgba(0,50,255,.75);
-		stroke-width:.25px;
-		filter: brightness(1.25)
-	}
-	.map-boundary .selected-polygon{
-		/*fill: #afa;*/
-		fill: #ffff55;
-		stroke: rgba(255,50,0,.75);
-		stroke-width:.5px;
-	}
-	.poly_text{
-		fill: #545;
-		font-size: 0.85rem;
-		transition: fill .125s;
-		text-shadow: 
-		0px 0px 1px white,
-		0px 0px 2px white,
-		0px 0px 3px white,
-		0px 0px 4px white,
-		0px 0px 5px white;
-	}
-	.poly_text:hover{
-		fill: #00c;
-		text-shadow: 0px 0px 5px #fff;
-		cursor: pointer;
-		font-weight: 1000;
-	}
-    .map-points circle{
-		stroke-width: .5px;
-		stroke: rgba(0,0,0,.25);
-		fill: transparent;
-	}
-	.map-points circle:hover{
-		cursor:pointer;
-		stroke: rgba(0,255,0,.5);
-	}
-	svg{
-		background: hsl(200, 50%, 75%);
-	}
-	.small-text{
-		font-size: .85rem;
-	}
-	.legendCells:after{
-		content: "";
-		display:block;
-		width: 100%;
-		height: 100%;
-		background-color: #ffffff;
-  		border: 1px solid black;
-	}
-	.selected-polygon{
-		stroke: red !important;
-		stroke-width: 1.5px !important;
-		z-index: 100;
-	}
-	.legendCells .cell text{
-		display: flex;
-  		align-items: center;
-	}
-    table{
-		border-collapse: collapse;
-		width: 100%;
-	}
-	
-	th{
-		white-space: nowrap;
-		background: #333;
-		color: #eee;
-		padding: .5rem .5rem;
-		border: 1px solid #555;
-		cursor: pointer;
-	}
+#map {
+    display: flex;
+    justify-content: space-around;
+    margin: 0 0.5rem;
+}
+
+#map #map-stats {
+    border: 1px solid pink;
+    width: 50%;
+    margin: 0 5px;
+    max-height: 80vh;
+    overflow: scroll;
+}
+#map-container {
+    display: flex;
+    justify-content: center;
+}
+.map-boundary path.state-boundary {
+    stroke-linejoin: round;
+    stroke-width: 0.5;
+    stroke: rgba(0, 0, 0, 1);
+    fill: none;
+}
+.map-boundary path:not(.state-boundary) {
+    stroke-linejoin: round;
+    stroke-width: 0.25;
+    stroke: rgba(0, 0, 0, 0.5);
+}
+.map-boundary path:not(.state-boundary):hover {
+    cursor: pointer;
+    fill: beige;
+}
+.map-boundary .current-state {
+    stroke: rgba(0, 50, 255, 0.75);
+    stroke-width: 0.25px;
+    filter: brightness(1.25);
+}
+.map-boundary .selected-polygon {
+    /*fill: #afa;*/
+    fill: #ffff55;
+    stroke: rgba(255, 50, 0, 0.75);
+    stroke-width: 0.5px;
+}
+.poly_text {
+    fill: #545;
+    font-size: 0.85rem;
+    transition: fill 0.125s;
+    text-shadow: 0px 0px 1px white, 0px 0px 2px white, 0px 0px 3px white,
+        0px 0px 4px white, 0px 0px 5px white;
+}
+.poly_text:hover {
+    fill: #00c;
+    text-shadow: 0px 0px 5px #fff;
+    cursor: pointer;
+    font-weight: 1000;
+}
+.map-points circle {
+    stroke-width: 0.5px;
+    stroke: rgba(0, 0, 0, 0.25);
+    fill: transparent;
+}
+.map-points circle:hover {
+    cursor: pointer;
+    stroke: rgba(0, 255, 0, 0.5);
+}
+svg {
+    background: hsl(200, 50%, 75%);
+}
+.small-text {
+    font-size: 0.85rem;
+}
+.legendCells:after {
+    content: "";
+    display: block;
+    width: 100%;
+    height: 100%;
+    background-color: #ffffff;
+    border: 1px solid black;
+}
+.selected-polygon {
+    stroke: red !important;
+    stroke-width: 1.5px !important;
+    z-index: 100;
+}
+.legendCells .cell text {
+    display: flex;
+    align-items: center;
+}
+table {
+    border-collapse: collapse;
+    width: 100%;
+}
+
+th {
+    white-space: nowrap;
+    background: #333;
+    color: #eee;
+    padding: 0.5rem 0.5rem;
+    border: 1px solid #555;
+    cursor: pointer;
+}
+tr td {
+    padding: 0.5rem 1rem;
+    border-top: 1px solid rgba(30, 60, 60, 0.25);
+}
+tr:nth-child(even) {
+    background-color: #e0e0e0;
+    color: #000;
+}
+tbody tr:hover td {
+    background: #ffa;
+}
+tr.no-data td {
+    background: #eaa;
+    color: #f00;
+}
+td.small-td {
+    font-size: 0.67rem;
+}
+@media screen and (max-width: 800px) {
+    .poly_text {
+        font-size: 3.5vw;
+    }
+    #map {
+        flex-direction: column;
+    }
     tr td {
-        padding: 0.5rem 1rem;
-		border-top: 1px solid rgba(30, 60, 60, .25);
+        padding: 0.125rem;
     }
-	tr:nth-child(even) {
-        background-color: #e0e0e0;
-		color:#000;
+    #map #map-stats {
+        width: 100%;
+        margin: 0.25rem;
+        max-height: 40vh;
+        overflow: scroll;
+        font-size: 0.75rem;
     }
-	tbody tr:hover td{
-		background: #ffa;
-	}
-	tr.no-data td{
-		background: #eaa;
-		color: #f00;
-	}
-	td.small-td{
-		font-size: .67rem;
-	}
-	@media screen and (max-width: 800px) {
-		.poly_text{
-			font-size: 3.5vw;
-		}
-		#map{
-			flex-direction: column;
-		}
-		tr td {
-			padding: 0.125rem;
-		}
-		#map #map-stats{
-			width: 100%;
-			margin: 0.25rem;
-			max-height: 40vh;
-			overflow:scroll;
-			font-size:.75rem;
-		}
-	}
+}
 </style>
 
 <template>
     <div ref="mapDiv">
-		<div class="map-controls">
-			<div class="switcher switcher-sm">
-				<button
-					class="btn"
-					v-for="pm in polygon_modes"
-					:key="pm"
-					:class="{'selected': pm === polygon_mode}"
-					@click="polygon_mode = pm"
-					v-text="pm"
-				/>
-			</div>
-			<div class="switcher switcher-sm">
-				<button
-					class="btn"
-					v-for="dm in data_modes"
-					:key="dm"
-					:class="{'selected': dm === data_mode}"
-					@click="data_mode = dm"
-					v-text="dm"
-				/>
-			</div>
-			<div class="switcher switcher-sm">
-				<button
-					class="btn"
-					v-for="ny in nmw_years"
-					:key="ny"
-					:class="{'selected': selected_years.includes(ny)}"
-					@click="selectYear(ny)"
-					v-text="ny"
-				/>
-			</div>
-		</div>
-		<div id="map">
-			<div id="map-container"></div>
-			<div id="map-stats">
-				<table class="table">
-					<thead>
-						<tr>
-							<th>Name</th>
-							<th @click="sortBy('observations')">Observations
-								<span v-if="data_mode == 'observations'">
-									<span v-if="sort_dir == 'desc'">▼</span>
-									<span v-else>▲</span>
-								</span>
-							</th>
-							<th @click="sortBy('users')">Users
-								<span v-if="data_mode == 'users'">
-									<span v-if="sort_dir == 'desc'">▼</span>
-									<span v-else>▲</span>
-								</span>
-							</th>
-							<th @click="sortBy('taxa')">Taxa
-								<span v-if="data_mode == 'taxa'">
-									<span v-if="sort_dir == 'desc'">▼</span>
-									<span v-else>▲</span>
-								</span>
-							</th>
-							<th @click="sortBy('locations')">Locations
-								<span v-if="data_mode == 'locations'">
-									<span v-if="sort_dir == 'desc'">▼</span>
-									<span v-else>▲</span>
-								</span>
-							</th>
-							<th @click="sortBy('nmw')">NMW
-								<span v-if="data_mode == 'nmw'">
-									<span v-if="sort_dir == 'desc'">▼</span>
-									<span v-else>▲</span>
-								</span>
-							</th>
-						</tr>
-					</thead>
-					<tbody>
-						<tr
-							v-for="(row, k) in sortedData"
-							:key="k"
-							:class="{'no-data': row.observations == 0}"
-						>
-							<td v-text="row.name"/>
-							<td v-text="row.observations"/>
-							<td v-text="row.users"/>
-							<td v-text="row.taxa"/>
-							<td v-text="row.locations"/>
-							<td class="small-td" v-text="row.nmw"/>
-						</tr>						
-					</tbody>
-				</table>
-			</div>
-		</div>
-	</div>
+        <div class="map-controls">
+            <div class="switcher switcher-sm">
+                <button
+                    class="btn"
+                    v-for="pm in polygon_modes"
+                    :key="pm"
+                    :class="{ selected: pm === polygon_mode }"
+                    @click="polygon_mode = pm"
+                    v-text="pm"
+                />
+            </div>
+            <div class="switcher switcher-sm">
+                <button
+                    class="btn"
+                    v-for="dm in data_modes"
+                    :key="dm"
+                    :class="{ selected: dm === data_mode }"
+                    @click="data_mode = dm"
+                    v-text="dm"
+                />
+            </div>
+            <div class="switcher switcher-sm">
+                <button
+                    class="btn"
+                    v-for="ny in nmw_years"
+                    :key="ny"
+                    :class="{ selected: selected_years.includes(ny) }"
+                    @click="selectYear(ny)"
+                    v-text="ny"
+                />
+            </div>
+        </div>
+        <div id="map">
+            <div id="map-container"></div>
+            <div id="map-stats">
+                <table class="table">
+                    <thead>
+                        <tr>
+                            <th>Name</th>
+                            <th @click="sortBy('observations')">
+                                Observations
+                                <span v-if="data_mode == 'observations'">
+                                    <span v-if="sort_dir == 'desc'">▼</span>
+                                    <span v-else>▲</span>
+                                </span>
+                            </th>
+                            <th @click="sortBy('users')">
+                                Users
+                                <span v-if="data_mode == 'users'">
+                                    <span v-if="sort_dir == 'desc'">▼</span>
+                                    <span v-else>▲</span>
+                                </span>
+                            </th>
+                            <th @click="sortBy('taxa')">
+                                Taxa
+                                <span v-if="data_mode == 'taxa'">
+                                    <span v-if="sort_dir == 'desc'">▼</span>
+                                    <span v-else>▲</span>
+                                </span>
+                            </th>
+                            <th @click="sortBy('locations')">
+                                Locations
+                                <span v-if="data_mode == 'locations'">
+                                    <span v-if="sort_dir == 'desc'">▼</span>
+                                    <span v-else>▲</span>
+                                </span>
+                            </th>
+                            <th @click="sortBy('nmw')">
+                                NMW
+                                <span v-if="data_mode == 'nmw'">
+                                    <span v-if="sort_dir == 'desc'">▼</span>
+                                    <span v-else>▲</span>
+                                </span>
+                            </th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        <tr
+                            v-for="(row, k) in sortedData"
+                            :key="k"
+                            :class="{ 'no-data': row.observations == 0 }"
+                        >
+                            <td v-text="row.name" />
+                            <td v-text="row.observations" />
+                            <td v-text="row.users" />
+                            <td v-text="row.taxa" />
+                            <td v-text="row.locations" />
+                            <td class="small-td" v-text="row.nmw" />
+                        </tr>
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
 </template>
 
 <script lang="js">
@@ -278,6 +279,7 @@ export default defineComponent({
     },
 	created(){
 		// console.clear()
+		store.dispatch("initData")
 		console.log("Map")
 		this.init_tooltip()
 	},
@@ -496,12 +498,12 @@ export default defineComponent({
 					this.max = Math.max(this.max, this.mapData[key][this.data_mode].length)
 				})
 			}
-			
+
 			this.colors = d3.scaleLinear()
 				.domain([0, 1, this.max*.25, this.max])
 				.range(["#f77", "#ca0", "#ada", "#3d3"])
 				.clamp(true)
-			
+
 			if(window.innerWidth < 800){
 				this.legend = d3Legend.legendColor()
 								.shapeHeight(20)
@@ -523,10 +525,10 @@ export default defineComponent({
 								.labelAlign("middle")
 								.cells(6)
 			}
-		},			
+		},
 		renderMap () {
 			this.init_legend()
-			
+
 			if (!d3.select("#map-container svg.svg-content").empty()) {
 				d3.select("#map-container svg.svg-content").remove()
 			}
@@ -552,7 +554,7 @@ export default defineComponent({
 				.selectAll("text").append("g")
 			this.polygons = base.append("g")
 				.classed("polygons", true)
-			
+
 			this.geojson[this.polygon_mode].features.forEach((polygon) => {
 				this.drawPolygon(polygon)
 				// if(this.polygon_mode != "districts"){
@@ -568,7 +570,7 @@ export default defineComponent({
 					this.drawPolygonBoundary(polygon)
 				})
 			}
-			
+
 			this.svg.append("g")
 				.attr("class", "legend")
 				.attr("transform", "translate("+this.legend_offset+", 25)")
@@ -583,7 +585,7 @@ export default defineComponent({
 				.enter().append("path")
 				.classed("state-boundary", true)
 				.classed("selected-polygon", (d) => {
-					return ((this.selected.state && d.properties.state == this.selected.state) 
+					return ((this.selected.state && d.properties.state == this.selected.state)
 					|| (this.selected.region && d.properties.region == this.selected.region))
 				})
 				.attr("properties", (d) => JSON.stringify(d.properties))
@@ -617,11 +619,11 @@ export default defineComponent({
 			// } else {
 			// 	polygon_data = polygon_data[polygon.properties.region]
 			// }
-			
+
 			if(polygon_data){
 				data = this.format_number(polygon_data[polygon.properties.state][this.data_mode])
 			}
-			
+
 			base_text.append("g")
 				.data([polygon])
 				.enter().append("text")
@@ -642,8 +644,8 @@ export default defineComponent({
 				})
 				.on('mouseout', () => this.tooltip.html(``).style('visibility', 'hidden'))
 				.on("click", (d, polygon_details) => this.clicked(polygon_details))
-			
-			
+
+
 		},
 		hover_text(properties){
 			const {region, state, district} = properties || {}
@@ -664,9 +666,9 @@ export default defineComponent({
 				delete tooltip_data.state
 			}
 			let op = Object.entries(tooltip_data)
-				.map(([key, value]) => `<tr><td>${this.capitalizeWords(key)}</td><td>${value ? value: "-"}</td></tr>`)	
+				.map(([key, value]) => `<tr><td>${this.capitalizeWords(key)}</td><td>${value ? value: "-"}</td></tr>`)
 			return `<table>${op.join('\n')}</table>`
-			
+
 		},
 		getPolygonId(polygon){
 			let op = polygon.region
@@ -706,11 +708,11 @@ export default defineComponent({
 			const polygon = polygon_details.geometry
 			this.tooltip.html(``).style('visibility', 'hidden')
 			let [[x0, y0], [x1, y1]] = [[0,0], [0,0]]
-			
+
 			d3.selectAll(".current-state").classed("current-state", false)
 			d3.selectAll(".selected-polygon").classed("selected-polygon", false)
 			if(this.selected.region == null || this.selected.region != region){
-				
+
 				this.selected.region = region;
 				[[x0, y0], [x1, y1]] = this.path.bounds(polygon);
 				d3.select("#" + this.getPolygonId(polygon_details.properties)).classed("selected-polygon", true)
@@ -723,7 +725,7 @@ export default defineComponent({
 				[[x0, y0], [x1, y1]] = this.path.bounds(this.geojson.regions);
 			}
 			// this.selectArea()
-			
+
 			this.svg.transition().duration(750).call(
 				this.zoom.transform,
 				d3.zoomIdentity
@@ -738,7 +740,7 @@ export default defineComponent({
 			const polygon = polygon_details.geometry
 			this.tooltip.html(``).style('visibility', 'hidden')
 			let [[x0, y0], [x1, y1]] = [[0,0], [0,0]]
-			
+
 			d3.selectAll(".current-state").classed("current-state", false)
 			d3.selectAll(".selected-polygon").classed("selected-polygon", false)
 			if(this.selected.state == null || this.selected.state != state){
@@ -754,7 +756,7 @@ export default defineComponent({
 				[[x0, y0], [x1, y1]] = this.path.bounds(this.geojson.regions);
 			}
 			// this.selectArea()
-			
+
 			this.svg.transition().duration(750).call(
 				this.zoom.transform,
 				d3.zoomIdentity
@@ -771,9 +773,9 @@ export default defineComponent({
 		},
 		selectArea () {
 			if(this.selected_area == "All"){
-				this.dispatchSelectArea("state", "All") 
+				this.dispatchSelectArea("state", "All")
 			} else if(this.area_names.state.indexOf(this.selected_area) != -1){
-				this.dispatchSelectArea("state", this.selected_area) 
+				this.dispatchSelectArea("state", this.selected_area)
 			}
 		},
 		sortBy(col){
