@@ -15,23 +15,46 @@
 
 <template>
     <div class="container d-flex flex-column text-center">
-
         <div class="btn-group">
-            <button type="button" class="btn btn-sm mx-1 rounded" :class="selected_year == null
-                ? 'btn-success'
-                : 'btn-outline-secondary'
-                " @click="selected_year = null">All</button>
-            <button type="button" class="btn btn-sm mx-1 rounded" v-for="year in years" :key="year" :class="selected_year == year
-                ? 'btn-success'
-                : 'btn-outline-secondary'
-                " v-text="year" @click="selected_year = year" />
+            <button
+                type="button"
+                class="btn btn-sm mx-1 rounded"
+                :class="
+                    selected_year == null
+                        ? 'btn-success'
+                        : 'btn-outline-secondary'
+                "
+                @click="selected_year = null"
+            >
+                All
+            </button>
+            <button
+                type="button"
+                class="btn btn-sm mx-1 rounded"
+                v-for="year in years"
+                :key="year"
+                :class="
+                    selected_year == year
+                        ? 'btn-success'
+                        : 'btn-outline-secondary'
+                "
+                v-text="year"
+                @click="selected_year = year"
+            />
         </div>
         <div class="d-flex flex-column">
             <div class="year-card">
-                <div class="selected-value" v-text="(selected_year) ? selected_year : 'All'"></div>
+                <div
+                    class="selected-value"
+                    v-text="selected_year ? selected_year : 'All'"
+                ></div>
             </div>
             <div class="totals-container d-flex">
-                <div class="card total-card" v-for="(value, label) in totals" :key="label">
+                <div
+                    class="card total-card"
+                    v-for="(value, label) in totals"
+                    :key="label"
+                >
                     <div class="card-body">
                         <h5 class="card-title">{{ value }}</h5>
                         <p class="card-text">{{ label }}</p>
@@ -39,23 +62,38 @@
                 </div>
             </div>
             <div class="btn-group">
-                <button type="button" class="btn btn-sm mx-1 rounded" v-for="chart in charts" :key="chart" :class="selected_chart == chart
-                    ? 'btn-success'
-                    : 'btn-outline-secondary'
-                    " v-text="chart" @click="selected_chart = chart" />
+                <button
+                    type="button"
+                    class="btn btn-sm mx-1 rounded"
+                    v-for="chart in charts"
+                    :key="chart"
+                    :class="
+                        selected_chart == chart
+                            ? 'btn-success'
+                            : 'btn-outline-secondary'
+                    "
+                    v-text="chart"
+                    @click="selected_chart = chart"
+                />
             </div>
             {{ selected_chart }}
             <div class="charts-container border border-danger">
-                <map-container :year="selected_year" v-if="selected_chart == 'Map'"/>
-                <id-level-chart :year="selected_year" v-else-if="selected_chart == 'ID_Level_Chart'"/>
-                <temporal-chart :year="selected_year" v-else-if="selected_chart == 'Dates_Chart'"/>
-
+                <map-container
+                    :year="selected_year"
+                    v-if="selected_chart == 'Map'"
+                />
+                <id-level-chart
+                    :year="selected_year"
+                    v-else-if="selected_chart == 'ID_Level_Chart'"
+                />
+                <temporal-chart
+                    :year="selected_year"
+                    v-else-if="selected_chart == 'Dates_Chart'"
+                />
             </div>
         </div>
-
     </div>
 </template>
-
 
 <script lang="js" setup>
 import { ref, computed, watch, onMounted } from "vue";
@@ -103,5 +141,4 @@ const totals = computed(() => {
 
     return op
 })
-
 </script>

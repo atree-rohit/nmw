@@ -1,32 +1,45 @@
 <style>
-svg {
+.pie-chart-container svg {
     max-width: 100%;
     height: auto;
 }
-.pie-slice {
+.pie-chart-container .pie-slice {
     stroke: transparent;
     stroke-width: 0.125rem;
     transition: all 100ms;
 }
-.pie-slice:hover {
+.pie-chart-container .pie-slice:hover {
     stroke: red;
-    /* translate: -2px -2px; */
 }
-.label {
+.pie-chart-container .pie-slice.selected {
+    stroke: red;
+    stroke-width: 0.25rem;
+}
+
+.pie-chart-container .label {
     text-anchor: middle;
-    font-size: 0.75rem;
+    font-size: 0.85rem;
+}
+foreignObject.center-text body {
+    text-transform: capitalize;
+    /* border: 1px solid saddlebrown; */
+}
+foreignObject.center-text.none-selected body {
+    fill: red;
+    opacity: 0.8;
 }
 </style>
 
 <template>
-    <div class="chart" ref="chartContainer"></div>
+    <div class="pie-chart-container">
+        <div class="chart" ref="chartContainer"></div>
+    </div>
 </template>
 
-<script setup>
-import { onMounted, watch, ref } from "vue";
+<script setup lang="js">
+import { onMounted, watch, ref, computed } from "vue";
 import * as d3 from "d3";
 
-const chartContainer = ref(null);
 const props = defineProps({
     data: {
         type: Array,
@@ -34,17 +47,7 @@ const props = defineProps({
     },
 });
 
-watch(
-    () => props.data,
-    (newVal, oldVal) => {
-        if (oldVal.length) {
-            updateChart();
-        } else {
-            renderChart();
-        }
-    }
-);
-
+const chartContainer = ref(null);
 const taxa_levels = [
     "order",
     "superfamily",
@@ -57,139 +60,138 @@ const taxa_levels = [
     "subspecies",
     "complex",
 ];
-
-const width = 275;
-const height = Math.min(width, 275);
+const width = window.innerWidth / 1.5;
+const height = window.innerHeight / 1.5;
 const radius = Math.min(width, height) / 2;
 
-const arc = d3
-    .arc()
-    .innerRadius(radius * 0.4)
-    .outerRadius(radius - 1);
+const svg = ref(null);
+const arc = d3.arc().innerRadius(radius * 0.4).outerRadius(radius - 1);
+const pie = d3.pie().padAngle(1 / radius).sort(null).value((d) => d.value);
+const pieData = computed(() => pie(props.data));
 
-const pie = d3
-    .pie()
-    .padAngle(1 / radius)
-    .sort(null)
-    .value((d) => d.value);
-
-const getColorScale = () => {
+const color = computed(() => {
     return d3
-        .scaleOrdinal()
-        .domain(taxa_levels)
-        .range(
-            d3
-                .quantize(
-                    (t) => d3.interpolateSpectral(t * 0.8 + 0.1),
-                    taxa_levels.length
-                )
-                .reverse()
-        );
-};
+        .scaleOrdinal().domain(taxa_levels).range(d3.quantize((t) => d3.interpolateSpectral(t * 1 + 0.01),taxa_levels.length).reverse());
+});
 
-const initializeSVG = () => {
-    let svg = d3.select(chartContainer.value.querySelector("svg"));
+const selectedSlice = ref(null);
+const centerCircleText = computed(() => selectedSlice.value  ? getLabelString(selectedSlice.value): "Click a slice to see data")
 
-    if (!svg.node()) {
-        svg = d3
-            .select(chartContainer.value)
-            .append("svg")
-            .attr("width", width)
-            .attr("height", height)
-            .attr("viewBox", [-width / 2, -height / 2, width, height])
-            .append("g");
+onMounted(() => {
+    renderChart();
+})
+
+watch(() => props.data, (newVal, oldVal) => {
+    oldVal.length ? updateChart() : renderChart();
+});
+
+const initSVG = () => {
+    if(!svg.value) {
+        svg.value = d3.select(chartContainer.value).append("svg").attr("width", width).attr("height", height).attr("viewBox", [-width / 2, -height / 2, width, height]).append("g");
     }
-    return svg;
-};
+}
 
-const renderLabels = (labels, pieData) => {
+const getLabelString = (data) =>  `${data.name}: ${data.value.toLocaleString()}`;
+
+const renderLabels = () => {
+    svg.value.selectAll(".label").remove();
+    const labels = svg.value.selectAll(".label");
     labels
-        .data(pieData)
+        .data(pieData.value)
         .enter()
         .append("text")
         .classed("label", true)
         .attr("dy", ".35em")
-        .attr("transform", (d) => `translate(${arc.centroid(d)})`)
-        .text((d) => `${d.data.name}: ${d.data.value.toLocaleString()}`);
+        .attr("transform", (d) => {
+            const [x, y] = arc.centroid(d);
+            let op = `translate(${x}, ${y}) `
+            const midAngle = (d.startAngle + d.endAngle) / 2;
+            let rotation = midAngle * (180 / Math.PI);
+            op += midAngle > Math.PI ? `rotate(90) rotate(${rotation})` : `rotate(-90) rotate(${rotation})`;
+            return op
+
+        })
+        .text((d) => getLabelString(d.data))
+        .on("click", handleClick);
 };
 
-const positionLabels = (labels) => {
-    labels.each(function (d, i) {
-        const thisLabel = d3.select(this);
-        const centroid = arc.centroid(d);
-        const midAngle = (d.startAngle + d.endAngle) / 2;
-        const x = centroid[0] * 1;
-        const y = centroid[1] * 1;
+const handleClick = (event, d) => {
+    selectedSlice.value = selectedSlice.value?.name === d.data?.name ? null : d.data;
 
-        let rotation = midAngle;
-        rotation = rotation * (180 / Math.PI);
-        if ((midAngle < Math.PI && x > 0) || (midAngle > Math.PI && x < 0)) {
-            thisLabel.attr(
-                "transform",
-                `translate(${x}, ${y}) rotate(-90) rotate(${rotation})`
-            );
-        } else {
-            const labelX = x + Math.cos(midAngle) * radius * 0.8;
-            const labelY = y + Math.sin(midAngle) * radius * 0.8;
-            thisLabel.attr("transform", `translate(${labelX}, ${labelY})`);
-        }
-    });
+    svg.value.selectAll(".pie-slice").classed("selected", false);
+    if (selectedSlice.value) {
+        d3.select(event.currentTarget).classed("selected", true);
+    }
+    addCenterText()
 };
+
+const drawCenterCircle = () => {
+    const centerX = width / 2;
+    const centerY = height / 2;
+    const radius = Math.min(width, height) / 4;
+    const centerCircle = svg.value.selectAll(".center-circle")
+        .data([null])
+        .enter()
+        .append("circle")
+        .classed("center-circle", true)
+        .attr("x", centerX)
+        .attr("y", centerY)
+        .attr("r", radius / 1.3)
+        .attr("fill", "none")
+        .attr("stroke", "red")
+        .attr("stroke-width", 2)
+        .attr("stroke-dasharray", "4")
+        .attr("pointer-events", "none");
+    addCenterText()
+    centerCircle.exit().remove();
+};
+
+const addCenterText = () => {
+    svg.value.selectAll(".center-text").remove();
+
+    const rad = radius * 0.5
+
+    let side = 2 * rad * Math.cos(Math.PI / 4) / 2
+    let dx = rad / 2 - side / 2;
+
+
+    let centerX = width / 2;
+    let centerY = height / 2;
+
+    let g = svg.value.append("foreignObject")
+        .attr("width", rad)
+        .attr("height", rad)
+        .attr('transform', 'translate(' + [-rad /2, -rad/2] + ')')
+        .attr('class', () => selectedSlice.value ? 'center-text' : 'center-text none-selected')
+        .append("xhtml:body")
+        .style("display", "flex")
+        .style("justify-content", "center")
+        .style("align-items", "center")
+        .style("height", "100%")
+        .text(centerCircleText.value);
+}
+
 
 const renderChart = () => {
-    console.log("render");
-    const color = getColorScale();
-    const svg = initializeSVG();
-    const pieData = pie(props.data);
-
-    const path = svg
-        .selectAll("path")
-        .data(pieData)
-        .enter()
-        .append("path")
-        .attr("fill", (d) => color(d.data.name))
-        .classed("pie-slice", true)
-        .attr("d", arc);
-
-    path.append("title").text(
-        (d) => `${d.data.name}: ${d.data.value.toLocaleString()}`
-    );
-
-    const labels = svg.selectAll(".label");
-    renderLabels(labels, pieData);
-    positionLabels(labels);
+    initSVG();
+    const path = svg.value.selectAll("path").data(pieData.value).enter().append("path").attr("fill", (d) => color.value(d.data.name)).classed("pie-slice", true).attr("d", arc).on("click", handleClick);
+    path.append("title").text((d) => getLabelString(d.data));
+    renderLabels();
+    drawCenterCircle();
 };
 
 const updateChart = () => {
-    console.log("update");
-    let svg = d3.select(chartContainer.value.querySelector("svg"));
-
-    const pieData = pie(props.data);
-    const path = svg.selectAll("path").data(pieData);
-
-    path.transition()
-        .duration(50) // Animation duration
-        .attrTween("d", function (d) {
-            const interpolate = d3.interpolate(this._current, d);
-            this._current = d; // Store the updated data for interpolation
-            return function (t) {
-                return arc(interpolate(t));
-            };
-        });
-
-    path.enter()
-        .append("path")
-        .attr("fill", (d) => color(d.data.name))
-        .classed("pie-slice", true)
-        .attr("d", arc);
-
-    path.append("title").text(
-        (d) => `${d.data.name}: ${d.data.value.toLocaleString()}`
-    );
+    const path = svg.value.selectAll("path").data(pieData.value);
+    path.transition().duration(50).attrTween("d", function (d) {
+        const interpolate = d3.interpolate(this._current, d);
+        this._current = d;
+        return function (t) {
+            return arc(interpolate(t));
+        };
+    });
+    path.enter().append("path").attr("fill", (d) => color.value(d.data.name)).classed("pie-slice", true).attr("d", arc);
+    path.select("title").text((d) => getLabelString(d.data));
     path.exit().remove();
-
-    const labels = svg.selectAll(".label");
-    renderLabels(labels, pieData);
-    positionLabels(labels);
+    renderLabels();
 };
 </script>
