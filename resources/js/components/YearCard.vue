@@ -1,35 +1,55 @@
-<style></style>
+<style>
+.year-card {
+    /* transform: scale(3); 
+    margin-top: 10rem; */
+    border: 2px solid hsl(187 49% 43% / 1) !important;
+    border-radius: 1rem;
+}
+
+.card-body {
+    padding: 0.5rem !important;
+}
+
+.card-title {
+    font-weight: 100;
+    font-size: 3.5rem;
+    /* background: red; */
+    margin: 0 !important;
+}
+
+.stat {
+    /* border: 1px solid green; */
+    padding: 0 1rem;
+}
+
+.stat-value {
+    /* border: 1px solid purple; */
+    margin: 0;
+}
+
+.stat-label {
+    text-transform: capitalize;
+    /* border: 1px solid blue; */
+}
+</style>
 
 <template>
-    <div class="card border border-dark">
+    <div class="year-card">
         <div class="card-body">
-            <h1 class="text-center card-title">{{ year }}</h1>
-            <div class="d-flex justify-content-around">
-                <div
-                    class="card"
-                    v-for="(value, total_key) in totals"
-                    :key="total_key"
-                >
-                    <div class="card-body text-center py-2">
-                        <h4 class="card-title">{{ value }}</h4>
-                        <div class="card-body">{{ total_key }}</div>
-                    </div>
+            <div class="stats-container d-flex">
+                <h1 class="card-title">{{ year }}</h1>
+                <div class="stat" v-for="(value, total_key) in totals" :key="total_key">
+                    <div class="stat-label">{{ total_key }}</div>
+                    <h5 class="stat-value">{{ value }}</h5>
                 </div>
             </div>
         </div>
-        <id-level-chart :year="year" />
-        <temporal-chart :year="year" />
-        <map-container :year="year" />
     </div>
 </template>
 
 <script lang="js" setup>
 import { ref, computed, watch } from "vue";
 import { useStore } from "vuex";
-
-import IdLevelChart from "./IdLevelChart.vue";
-import TemporalChart from "./TemporalChart.vue";
-import MapContainer from "./MapContainer.vue";
 
 const store = useStore();
 

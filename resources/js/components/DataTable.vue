@@ -2,12 +2,6 @@
 
 <template>
     <div>
-        <div
-            class="d-flex flex-wrap justify-content-around container-fluid p-3"
-        >
-            <!-- <year-card v-for="index in 12" :key="index" :year="index + 2011" /> -->
-            <year-card v-for="year in years" :key="year" :year="year" />
-        </div>
         <table class="table border border-danger">
             <thead class="table-danger">
                 <tr>
@@ -53,7 +47,6 @@ import { useStore } from "vuex";
 import DataTableTaxaLevels from "./DataTableTaxaLevels.vue";
 import DataTableLocations from "./DataTableLocations.vue";
 import DataTableDates from "./DataTableDates.vue";
-import IdLevelChart from "./IdLevelChart.vue";
 import YearCard from "./YearCard.vue";
 
 const store = useStore();

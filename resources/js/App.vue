@@ -3,13 +3,15 @@
 <template>
     <div>
         <!-- <species-data /> -->
-        <data-table />
+        <!-- <data-table /> -->
+        <years-container />
     </div>
 </template>
 
 <script lang="ts" setup>
-import DataTable from "./components/DataTable.vue";
 import SpeciesData from "./components/SpeciesData.vue";
+import DataTable from "./components/DataTable.vue";
+import YearsContainer from "./components/YearsContainer.vue";
 import { onMounted } from "vue";
 import { useStore } from "vuex";
 

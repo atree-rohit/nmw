@@ -206,22 +206,20 @@ const containerID = ref("containerIDPrefix" + Math.floor(Math.random() * 1000));
 watch(() => props.data, (newVal) => {
 	setTimeout(() => {
 		init()
-		init_tooltip()
-		init_colors()
-		renderMap()
 	}, 250)
 })
 
 watch(() => props.labels, () => {
-	renderMap();
+	init();
+})
+
+watch(() => props.year, () => {
+	init();
 })
 
 onMounted(() => {
 	setTimeout(() => {
 		init()
-		init_tooltip()
-		init_colors()
-		renderMap()
 	}, 250)
 })
 
@@ -249,6 +247,12 @@ const color_polygon = (polygon) => {
 }
 
 const init = ()  => {
+	init_vars()
+	init_tooltip()
+	init_colors()
+	renderMap()
+}
+const init_vars = ()  => {
 	containerID.value = "map-container_" + props.year
 	polygons.value = null
 	path.value = null
