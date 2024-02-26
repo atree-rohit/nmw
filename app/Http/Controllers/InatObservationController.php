@@ -51,7 +51,8 @@ class InatObservationController extends Controller
         foreach ($observations->groupBy("nmw") as $year => $year_observations) {    
             $data[$year] = $this->getYearStats($year_observations);
         }
-        $data["all"] = $this->getYearStats($observations);
+        $data[0] = $this->getYearStats($observations);
+
         file_put_contents(public_path("data/nmw_data_2012_to_2023.json"), json_encode($data));
         return response()->json("JSON Set Successful", 200);
 
@@ -112,38 +113,23 @@ class InatObservationController extends Controller
     }
 
     private function getLocationsCount($observations)
-    {
-        $locations_array = [];
-        $count = [];
-        foreach($observations->groupBy("location_id") as $location_observations){
-            $location = $location_observations->first()->location;
-            if(!isset($locations_array[$location->region])){
-                $locations_array[$location->region] = [];
-            }
+{
+    $count = [];
 
-            if(!isset($locations_array[$location->region][$location->state])){
-                $locations_array[$location->region][$location->state] = [];
-            } 
-
-            if(!isset($locations_array[$location->region][$location->state][$location->district])){
-                $locations_array[$location->region][$location->state][$location->district] = $location_observations->toArray();
-            } 
-        }
+    foreach ($observations->groupBy("location_id") as $location_observations) {
+        $location = $location_observations->first()->location;
+        $count[$location->region]["region_total"] ??= 0;
+        $count[$location->region]["region_total"] += count($location_observations);
         
-        foreach($locations_array as $region => $states){
-            $count[$region] = ["region_total" => 0];
-            foreach($states as $state => $districts){
-                $count[$region][$state] = ["state_total" => 0];
-                foreach($districts as $district => $observations){
-                    $no_of_observations = count($observations);
-                    $count[$region]["region_total"] += $no_of_observations;
-                    $count[$region][$state]["state_total"] += $no_of_observations;
-                    $count[$region][$state][$district] = $no_of_observations;
-                }
-            }
-        }
-        return $count;
+        $count[$location->region][$location->state]["state_total"] ??= 0;
+        $count[$location->region][$location->state]["state_total"] += count($location_observations);
+        
+        $count[$location->region][$location->state][$location->district] ??= 0;
+        $count[$location->region][$location->state][$location->district] += count($location_observations);
     }
+    return $count;
+}
+
 
     private function getDatesCount($observations)
     {

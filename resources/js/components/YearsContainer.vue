@@ -117,6 +117,7 @@ const totals = computed(() => {
     const keys = Object.keys(nmw_data.value)
     if (keys.length == 0) return op
     const year_data = nmw_data.value[selected_year.value]
+
     op.observations = year_data.total_observations
     op.taxa = year_data.total_taxa
     op.users = year_data.total_users

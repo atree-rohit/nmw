@@ -204,22 +204,18 @@ const tooltip = ref(null);
 const containerID = ref("containerIDPrefix" + Math.floor(Math.random() * 1000)); // Generate a unique container ID
 
 watch(() => props.data, () => {
-	console.log("props.data")
 	init()
 })
 
 watch(() => props.labels, () => {
-	console.log("props.labels")
 	init();
 })
 
 watch(() => props.year, () => {
-	console.log("props.year")
 	init();
 })
 
 onMounted(() => {
-	console.log("map mounted")
 	init()
 })
 
@@ -297,7 +293,6 @@ const renderMap = () => {
 	init_legend()
 
 	if (!d3.select(`#containerID svg.svg-content`).empty()) {
-		console.log("delete")
 		d3.select(`#containerID svg.svg-content`).remove()
 	}
 	svg.value = d3.select(`#containerID`)
