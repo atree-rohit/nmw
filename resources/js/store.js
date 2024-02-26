@@ -36,7 +36,7 @@ const store = createStore({
             }
         },
         async initNMWData({ commit }) {
-            const observations = await axios.get("/nmw_data")
+            const observations = await axios.get("nmw_data")
             
             commit("SET_NMW_DATA", JSON.parse(observations.data))
         }
