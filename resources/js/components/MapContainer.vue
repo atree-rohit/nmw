@@ -1,13 +1,11 @@
 <template>
     <div class="d-flex flex-column border border-info m-1 rounded p-1 gap-2">
-        <template v-if="showD3Map">
-            <d3-map
-                :level="selected_map_level"
-                :data="locations"
-                :year="year"
-                :labels="showLabels"
-            />
-        </template>
+        <d3-map
+            :level="selected_map_level"
+            :data="locations"
+            :year="year"
+            :labels="showLabels"
+        />
         <button
             class="btn btn-sm"
             :class="showLabels ? 'btn-success' : 'btn-outline-danger'"
@@ -48,10 +46,10 @@ const props = defineProps({
 });
 
 const nmw_data = computed(() => store.state.nmw_data);
-const map_modes = ["regions", "states", "districts"]
+// const map_modes = ["regions", "states", "districts"]
+const map_modes = ["regions", "states"]
 const selected_mode = ref(0)
 const selected_map_level = computed(() => map_modes[selected_mode.value])
-const showD3Map = ref(false);
 const showLabels = ref(true);
 
 
@@ -96,11 +94,4 @@ const locations = computed(() => {
     }
     return op.sort((a,b) => b.value - a.value)
 })
-
-onMounted(() => {
-    setTimeout(() => {
-        showD3Map.value = true;
-        console.log("loaded")
-    }, 100);
-});
 </script>

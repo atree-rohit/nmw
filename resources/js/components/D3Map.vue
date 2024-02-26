@@ -155,7 +155,7 @@ tbody tr:hover td {
 <template>
     <div class="mapDiv">
         <div id="map">
-            <div :id="containerID"></div>
+            <div id="containerID"></div>
         </div>
     </div>
 </template>
@@ -203,24 +203,24 @@ const width = ref(0);
 const tooltip = ref(null);
 const containerID = ref("containerIDPrefix" + Math.floor(Math.random() * 1000)); // Generate a unique container ID
 
-watch(() => props.data, (newVal) => {
-	setTimeout(() => {
-		init()
-	}, 250)
+watch(() => props.data, () => {
+	console.log("props.data")
+	init()
 })
 
 watch(() => props.labels, () => {
+	console.log("props.labels")
 	init();
 })
 
 watch(() => props.year, () => {
+	console.log("props.year")
 	init();
 })
 
 onMounted(() => {
-	setTimeout(() => {
-		init()
-	}, 250)
+	console.log("map mounted")
+	init()
 })
 
 const zoom = () => d3.zoom()
@@ -242,9 +242,7 @@ const getMatchingPolygon = (polygon) => {
 	return data.find((d) => d.name == polygon[key])
 }
 
-const color_polygon = (polygon) => {
-	return colors.value(getMatchingPolygon(polygon)?.value ?? 0)
-}
+const color_polygon = (polygon) => colors.value(getMatchingPolygon(polygon)?.value ?? 0)
 
 const init = ()  => {
 	init_vars()
@@ -257,13 +255,9 @@ const init_vars = ()  => {
 	polygons.value = null
 	path.value = null
 	svg.value = {}
-	height.value = window.innerHeight * 0.5
-	width.value = window.innerWidth * 0.25
-	if(window.innerWidth < 800){
-		projection.value = d3.geoMercator().scale(400).center([85, 20])
-	} else {
-		projection.value = d3.geoMercator().scale(600).center([109.5, 18])
-	}
+	height.value = window.innerHeight * 0.6
+	width.value = window.innerWidth * 0.75
+	projection.value = d3.geoMercator().scale(750).center([75, 22])
 	path.value = d3.geoPath().projection(projection.value)
 }
 
@@ -274,7 +268,7 @@ const init_tooltip = () => {
         return;
     }
 	tooltip.value = d3.select('body')
-				.append('div')// Tooltip already exists, return without appending
+				.append('div')
 				.attr('class', 'd3-tooltip')
 				.style('visibility', 'hidden')
 				.text('a simple tooltip')
@@ -302,10 +296,11 @@ const init_colors = () => {
 const renderMap = () => {
 	init_legend()
 
-	if (!d3.select(`#${containerID.value} svg.svg-content`).empty()) {
-		d3.select(`#${containerID.value} svg.svg-content`).remove()
+	if (!d3.select(`#containerID svg.svg-content`).empty()) {
+		console.log("delete")
+		d3.select(`#containerID svg.svg-content`).remove()
 	}
-	svg.value = d3.select(`#${containerID.value}`)
+	svg.value = d3.select(`#containerID`)
 				.append("svg")
 					.attr("preserveAspectRatio", "xMinYMin meet")
 					.attr("width", width.value)
@@ -336,6 +331,7 @@ const renderMap = () => {
 
 	svg.value.call(zoom())
 	legendGroup.call(legend.value);
+	// console.log(json.value)
 }
 
 const drawPolygon = (polygon) => {
@@ -343,7 +339,6 @@ const drawPolygon = (polygon) => {
 		.data([polygon])
 		.enter().append("path")
 		.attr("d", path.value)
-		.attr("id", getPolygonId(polygon.properties))
 		.attr("fill", (d) => color_polygon(polygon.properties))
 		.on('mouseover', (d, i) => {
 			tooltip.value.html(hover_text(polygon.properties))
@@ -401,20 +396,5 @@ const hover_text = (properties) => {
 		}
 	}
 	return `<table><tr><td>${polygon_data.name}</td><td>${polygon_data.value}</td></tr></table>`
-}
-
-const getPolygonId = (polygon) => {
-	let op = polygon.region
-	let replace_chars = [" ", "&", "(", ")", "."]
-	if(polygon.state != undefined){
-		op = polygon.state
-	}
-	if(polygon.district != undefined){
-		op = polygon.district
-	}
-	replace_chars.forEach((c) => {
-		op = op.replaceAll(c, "_")
-	})
-	return op
 }
 </script>

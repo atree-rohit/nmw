@@ -101,9 +101,9 @@ const years = Array.from(
     (_, index) => startYear + index
 );
 const charts = ["Map", "ID_Level_Chart", "Dates_Chart"]
-const selected_chart = ref("ID_Level_Chart")
+const selected_chart = ref(null)
 
-const selected_year = ref(2012);
+const selected_year = ref(0);
 
 const store = useStore();
 
@@ -116,15 +116,6 @@ const totals = computed(() => {
     }
     const keys = Object.keys(nmw_data.value)
     if (keys.length == 0) return op
-    // if (selected_year.value == null) {
-    //     keys.forEach((year) => {
-    //         const year_data = nmw_data.value[year]
-    //         op.observations += year_data.total_observations
-    //         op.taxa += year_data.total_taxa
-    //         op.users += year_data.total_users
-    //     })
-    //     return op
-    // }
     const year_data = nmw_data.value[selected_year.value]
     op.observations = year_data.total_observations
     op.taxa = year_data.total_taxa
