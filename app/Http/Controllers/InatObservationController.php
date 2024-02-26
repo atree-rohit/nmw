@@ -51,7 +51,7 @@ class InatObservationController extends Controller
         foreach ($observations->groupBy("nmw") as $year => $year_observations) {    
             $data[$year] = $this->getYearStats($year_observations);
         }
-        // dd($data);
+        $data["all"] = $this->getYearStats($observations);
         file_put_contents(public_path("data/nmw_data_2012_to_2023.json"), json_encode($data));
         return response()->json("JSON Set Successful", 200);
 

@@ -14,17 +14,15 @@
 </style>
 
 <template>
-    <div class="container d-flex flex-column text-center">
+    <div class="container-fluid d-flex flex-column text-center mt-4 gap-2">
         <div class="btn-group">
             <button
                 type="button"
                 class="btn btn-sm mx-1 rounded"
                 :class="
-                    selected_year == null
-                        ? 'btn-success'
-                        : 'btn-outline-secondary'
+                    selected_year == 0 ? 'btn-success' : 'btn-outline-secondary'
                 "
-                @click="selected_year = null"
+                @click="selected_year = 0"
             >
                 All
             </button>
@@ -42,13 +40,7 @@
                 @click="selected_year = year"
             />
         </div>
-        <div class="d-flex flex-column">
-            <div class="year-card">
-                <div
-                    class="selected-value"
-                    v-text="selected_year ? selected_year : 'All'"
-                ></div>
-            </div>
+        <div class="d-flex flex-column gap-2">
             <div class="totals-container d-flex">
                 <div
                     class="card total-card"
@@ -76,7 +68,6 @@
                     @click="selected_chart = chart"
                 />
             </div>
-            {{ selected_chart }}
             <div class="charts-container border border-danger">
                 <map-container
                     :year="selected_year"
@@ -125,15 +116,15 @@ const totals = computed(() => {
     }
     const keys = Object.keys(nmw_data.value)
     if (keys.length == 0) return op
-    if (selected_year.value == null) {
-        keys.forEach((year) => {
-            const year_data = nmw_data.value[year]
-            op.observations += year_data.total_observations
-            op.taxa += year_data.total_taxa
-            op.users += year_data.total_users
-        })
-        return op
-    }
+    // if (selected_year.value == null) {
+    //     keys.forEach((year) => {
+    //         const year_data = nmw_data.value[year]
+    //         op.observations += year_data.total_observations
+    //         op.taxa += year_data.total_taxa
+    //         op.users += year_data.total_users
+    //     })
+    //     return op
+    // }
     const year_data = nmw_data.value[selected_year.value]
     op.observations = year_data.total_observations
     op.taxa = year_data.total_taxa

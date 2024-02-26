@@ -2,7 +2,7 @@
 
 <template>
     <div class="d-flex flex-column border border-info m-1 rounded p-1 gap-2">
-        <D3DateChart :data="data" class="mx-auto" />
+        <D3DateChart :data="data" :year="year" class="mx-auto" />
         <div class="btn-group">
             <button
                 type="button"
@@ -37,7 +37,7 @@ const selected_data_mode = ref(0)
 const data = computed(()=> {
     const op = []
     const all_data = nmw_data.value[props.year]?.dates
-    if(!all_data) return op
+    if(!all_data || props.year == 0) return op
     Object.keys(all_data).forEach((d) => {
         const date_arr = d.split("-")
         op.push({

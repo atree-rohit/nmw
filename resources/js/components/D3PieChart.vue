@@ -146,6 +146,11 @@ const drawCenterCircle = () => {
     centerCircle.exit().remove();
 };
 
+const removeCenterCircle = () => {
+    svg.value.selectAll(".center-circle").remove();
+    svg.value.selectAll(".center-text").remove();
+}
+
 const addCenterText = () => {
     svg.value.selectAll(".center-text").remove();
 
@@ -193,5 +198,8 @@ const updateChart = () => {
     path.select("title").text((d) => getLabelString(d.data));
     path.exit().remove();
     renderLabels();
+    if(Object.keys(pieData.value) == 0){
+        removeCenterCircle()
+    }
 };
 </script>
