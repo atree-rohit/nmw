@@ -19,6 +19,3 @@ Route::middleware('auth:sanctum')->get('/user', function (Request $request) {
     return $request->user();
 });
 
-
-Route::get('generate_data_json', [InatObservationController::class, 'generate_data_json']);
-

@@ -35,6 +35,36 @@ class InatObservationController extends Controller
     }
 
     
+    public function all_observations_table()
+    {
+        $observations = InatObservation::with(["user", "taxa", "location"])->where("nmw", "<>", null)->limit(-1)->get();
+        $data = [];
+        
+        foreach ($observations->groupBy("nmw") as $year => $year_observations) {    
+            $data[$year] = $this->getYearStats($year_observations);
+        }
+        $data[0] = $this->getYearStats($observations);
+
+        echo "<table border=1>";
+        foreach($observations as $o){
+            echo "<tr>";
+            echo "<td>".$o->id."</td>";
+            echo "<td>".$o->observed_on."</td>";
+            echo "<td>".$o->latitude."</td>";
+            echo "<td>".$o->longitude."</td>";
+            echo "<td>".$o->nmw."</td>";
+            echo "<td>".$o->user_id."</td>";
+            echo "<td>".$o->taxa_id."</td>";
+            echo "<td>".$o->taxa->scientific_name."</td>";
+            echo "<td>".$o->taxa->rank."</td>";
+            echo "<td>".$o->location->id."</td>";
+            echo "<td>".$o->location->region."</td>";
+            echo "<td>".$o->location->state."</td>";
+            echo "<td>".$o->location->district."</td>";
+            echo "</tr>";
+        }
+        echo "</table>";
+    }
     public function generate_data_json()
     {
         $nmw_dates = file_get_contents(public_path("data/nmw_dates.json"));
