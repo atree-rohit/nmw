@@ -1,11 +1,5 @@
 <template>
     <div class="d-flex flex-column border border-info m-1 rounded p-1 gap-2">
-        <d3-map
-            :level="selected_map_level"
-            :data="locations"
-            :year="year"
-            :labels="showLabels"
-        />
         <button
             class="btn btn-sm"
             :class="showLabels ? 'btn-success' : 'btn-outline-danger'"
@@ -28,6 +22,12 @@
                 @click="selected_mode = m_id"
             />
         </div>
+        <d3-map
+            :level="selected_map_level"
+            :data="locations"
+            :year="year"
+            :labels="showLabels"
+        />
     </div>
 </template>
 

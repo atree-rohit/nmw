@@ -255,8 +255,8 @@ const init_vars = ()  => {
 	polygons.value = null
 	path.value = null
 	svg.value = {}
-	height.value = window.innerHeight * 0.6
-	width.value = window.innerWidth * 0.75
+	height.value = window.innerHeight * 0.8
+	width.value = window.innerWidth * 0.5
 	projection.value = d3.geoMercator().scale(750).center([75, 22])
 	path.value = d3.geoPath().projection(projection.value)
 }
@@ -276,7 +276,7 @@ const init_tooltip = () => {
 const init_legend = () => {
 	legend.value = d3Legend.legendColor()
 					.shapeHeight(20)
-					.shapeWidth(40)
+					.shapeWidth(60)
 					.scale(colors.value)
 					.labelFormat(d3.format(",.0f"))
 					.orient('horizontal')
