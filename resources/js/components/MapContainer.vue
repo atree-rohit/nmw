@@ -6,28 +6,6 @@
             :year="year"
             :labels="showLabels"
         />
-        <button
-            class="btn btn-sm"
-            :class="showLabels ? 'btn-success' : 'btn-outline-danger'"
-            @click="showLabels = !showLabels"
-        >
-            {{ showLabels ? "Hide" : "Show" }} Labels
-        </button>
-        <div class="btn-group">
-            <button
-                type="button"
-                class="btn btn-sm"
-                v-for="(mode, m_id) in map_modes"
-                :key="m_id"
-                :class="
-                    selected_mode == m_id
-                        ? 'btn-success'
-                        : 'btn-outline-secondary'
-                "
-                v-text="mode"
-                @click="selected_mode = m_id"
-            />
-        </div>
     </div>
 </template>
 

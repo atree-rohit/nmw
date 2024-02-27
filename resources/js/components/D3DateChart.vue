@@ -1,17 +1,75 @@
+<style>
+.bar-chart-container {
+    /* position: absolute; */
+}
+.x-axis,
+.y-axis {
+    font-size: 1.5rem;
+}
+
+.bar-chart-container .controls-container {
+    /* top: 180px; */
+}
+.bar-chart-container:hover .controls-container {
+    opacity: 1;
+}
+</style>
+
 <template>
-    <div class="chart-container" ref="chartContainer"></div>
+    <div class="bar-chart-container">
+        <div class="controls-container">
+            <button
+                type="button"
+                class="btn btn-sm"
+                v-for="(mode, m_id) in data_modes"
+                :key="m_id"
+                :class="
+                    selected_data_mode == m_id
+                        ? 'btn-success'
+                        : 'btn-outline-danger'
+                "
+                v-text="mode"
+                @click="selected_data_mode = m_id"
+            />
+        </div>
+        <div
+            class="chart-container p-2 bg-light rounded"
+            ref="chartContainer"
+        ></div>
+    </div>
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from "vue";
+import { ref, onMounted, watch, computed } from "vue";
 import * as d3 from "d3";
+
+import { useStore } from "vuex";
+
+const store = useStore();
+
+const nmw_data = computed(() => store.state.nmw_data);
+const data_modes = ["Observations", "Taxa", "Users"];
+const selected_data_mode = ref(0);
+
+const data = computed(() => {
+    const op = [];
+    const all_data = nmw_data.value[props.year]?.dates;
+    if (!all_data || props.year == 0) return op;
+    Object.keys(all_data).forEach((d) => {
+        const date_arr = d.split("-");
+        op.push({
+            name: date_arr[2],
+            value: all_data[d][
+                data_modes[selected_data_mode.value].toLowerCase()
+            ],
+        });
+    });
+    op.sort((a, b) => a - b);
+    return op;
+});
 
 const chartContainer = ref(null);
 const props = defineProps({
-    data: {
-        type: Array,
-        required: true,
-    },
     year: {
         type: Number,
         required: true,
@@ -21,8 +79,8 @@ const props = defineProps({
 onMounted(() => renderChart());
 
 watch(
-    () => [props.data, props.year],
-    ([newData, newYear], [oldData, oldYear]) => {
+    () => props.year,
+    (newData, oldData) => {
         const svg = chartContainer.value.querySelector("svg");
         if (svg) {
             svg.remove();
@@ -38,13 +96,13 @@ const height = window.innerHeight / 1.5 - margin.top - margin.bottom;
 const renderChart = () => {
     const x = d3
         .scaleBand()
-        .domain(props.data.map((d) => d.name))
+        .domain(data.value.map((d) => d.name))
         .range([margin.left, width])
         .padding(0.1);
 
     const y = d3
         .scaleLinear()
-        .domain([0, d3.max(props.data, (d) => d.value)])
+        .domain([0, d3.max(data.value, (d) => d.value)])
         .range([height, margin.top]);
 
     const svg = d3
@@ -64,7 +122,7 @@ const renderChart = () => {
         .attr("transform", `translate(${margin.left},${margin.top})`);
 
     g.selectAll("rect")
-        .data(props.data)
+        .data(data.value)
         .join("rect")
         .attr("x", (d) => x(d.name))
         .attr("y", (d) => y(d.value))
@@ -94,10 +152,3 @@ const renderChart = () => {
     chartContainer.value.appendChild(svg.node());
 };
 </script>
-
-<style scoped>
-/* .chart-container {
-    max-width: 100%;
-    height: auto;
-} */
-</style>

@@ -18,20 +18,47 @@
 
 .pie-chart-container .label {
     text-anchor: middle;
-    font-size: 0.85rem;
+    font-size: 1.15rem;
+}
+foreignObject.center-text {
+    padding: 0.25rem;
+    border-radius: 33%;
 }
 foreignObject.center-text body {
     text-transform: capitalize;
+    font-size: 1.5rem;
+    text-align: center;
     /* border: 1px solid saddlebrown; */
 }
 foreignObject.center-text.none-selected body {
     fill: red;
     opacity: 0.8;
 }
+.pie-chart-container .controls-container {
+    top: 80px;
+}
+.pie-chart-container:hover .controls-container {
+    opacity: 1;
+}
 </style>
 
 <template>
-    <div class="pie-chart-container">
+    <div class="pie-chart-container py-3">
+        <span class="controls-container">
+            <button
+                type="button"
+                class="btn btn-sm mx-1"
+                v-for="(mode, m_id) in data_modes"
+                :key="m_id"
+                :class="
+                    selected_data_mode == m_id
+                        ? 'btn-success'
+                        : 'btn-outline-danger'
+                "
+                v-text="mode"
+                @click="selected_data_mode = m_id"
+            />
+        </span>
         <div class="chart" ref="chartContainer"></div>
     </div>
 </template>
@@ -39,14 +66,39 @@ foreignObject.center-text.none-selected body {
 <script setup lang="js">
 import { onMounted, watch, ref, computed } from "vue";
 import * as d3 from "d3";
+import { useStore } from "vuex";
 
 const props = defineProps({
-    data: {
-        type: Array,
+    year: {
+        type: Number,
         required: true,
     },
 });
 
+const store = useStore();
+const nmw_data = computed(() => store.state.nmw_data);
+const id_levels_data = computed(()=> nmw_data.value[props.year]?.count_id_levels)
+const data_modes = ["Observations", "Taxa"]
+const selected_data_mode = ref(0)
+
+const data = computed(() => {
+    let op = []
+    if(!id_levels_data.value){
+        return op
+    }
+    const taxa_levels = ["order","superfamily","family","subfamily","tribe","subtribe","genus","species","subspecies","complex"];
+    taxa_levels.forEach((t) => {
+        if(id_levels_data.value[t]){
+            op.push({
+                name: t,
+                value: id_levels_data.value[t][data_modes[selected_data_mode.value].toLowerCase()]
+            })
+
+        }
+    })
+    return op
+
+})
 const chartContainer = ref(null);
 const taxa_levels = [
     "order",
@@ -67,7 +119,7 @@ const radius = Math.min(width, height) / 2;
 const svg = ref(null);
 const arc = d3.arc().innerRadius(radius * 0.4).outerRadius(radius - 1);
 const pie = d3.pie().padAngle(1 / radius).sort(null).value((d) => d.value);
-const pieData = computed(() => pie(props.data));
+const pieData = computed(() => pie(data.value));
 
 const color = computed(() => {
     return d3
@@ -75,13 +127,14 @@ const color = computed(() => {
 });
 
 const selectedSlice = ref(null);
-const centerCircleText = computed(() => selectedSlice.value  ? getLabelString(selectedSlice.value): "Click a slice to see data")
+const centerCircleText = computed(() => selectedSlice.value  ? getLabelString(selectedSlice.value).replace(":", ""): "Click a slice to see data")
 
 onMounted(() => {
     renderChart();
 })
 
-watch(() => props.data, (newVal, oldVal) => {
+watch(() => data.value, (newVal, oldVal) => {
+    handleClick({}, null)
     oldVal.length ? updateChart() : renderChart();
 });
 
@@ -116,11 +169,11 @@ const renderLabels = () => {
 };
 
 const handleClick = (event, d) => {
-    selectedSlice.value = selectedSlice.value?.name === d.data?.name ? null : d.data;
+    selectedSlice.value = selectedSlice.value?.name === d?.data?.name ? null : d?.data;
 
     svg.value.selectAll(".pie-slice").classed("selected", false);
     if (selectedSlice.value) {
-        d3.select(event.currentTarget).classed("selected", true);
+        d3.select(event?.currentTarget).classed("selected", true);
     }
     addCenterText()
 };

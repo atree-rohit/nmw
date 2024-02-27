@@ -93,9 +93,32 @@
     cursor: pointer;
     stroke: rgba(0, 255, 0, 0.5);
 }
-.mapDiv svg {
-    background: hsl(200, 50%, 75%);
+#svg-container {
+    position: relative;
 }
+
+.controls-container {
+    background: rgba(0, 0, 0, 0.33);
+    position: absolute;
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 0.25rem;
+    padding: 0.5rem;
+    border: 1px solid rgba(100, 100, 100, 0.5);
+    border-radius: 0.5rem;
+    opacity: 0;
+    transition: all 450ms;
+}
+
+#svg-container:hover .controls-container {
+    opacity: 1;
+}
+
+#svg-container .controls-container .btn {
+    text-transform: capitalize;
+}
+
 .small-text {
     font-size: 0.85rem;
 }
@@ -138,8 +161,6 @@ tbody tr:hover td {
 .d3-tooltip {
     position: absolute;
     top: 0;
-    /* z-index: 10;
-	visibility: hidden; */
     padding: 10px;
     background: rgba(0, 0, 0, 0.6);
     border-radius: 4px;
@@ -153,9 +174,31 @@ tbody tr:hover td {
 </style>
 
 <template>
-    <div class="mapDiv">
-        <div id="map">
-            <div id="containerID"></div>
+    <div class="map-container">
+        <div id="svg-container">
+            <div class="controls-container">
+                <button
+                    class="btn btn-sm"
+                    :class="showLabels ? 'btn-success' : 'btn-outline-danger'"
+                    @click="showLabels = !showLabels"
+                >
+                    Labels
+                </button>
+                <div class="continer border border-secondary"></div>
+                <button
+                    type="button"
+                    class="btn btn-sm"
+                    v-for="(mode, m_id) in map_modes"
+                    :key="m_id"
+                    :class="
+                        selected_mode == m_id
+                            ? 'btn-success'
+                            : 'btn-outline-danger'
+                    "
+                    v-text="mode"
+                    @click="selected_mode = m_id"
+                />
+            </div>
         </div>
     </div>
 </template>
@@ -169,27 +212,45 @@ import * as d3Legend from "d3-svg-legend"
 const store = useStore();
 
 const props = defineProps({
-    level: {
-        type: String,
-        required: true,
-    },
 	year: {
 		type: Number,
         required: true,
-	},
-	data: {
-		type: Array,
-        required: true,
-	},
-	labels: {
-		type: Boolean,
-        required: false,
-		default: true,
 	}
 });
 
-const json = computed(() => store.state.geojson[props.level]);
+const json = computed(() => store.state.geojson[selected_map_level.value]);
+const nmw_data = computed(() => store.state.nmw_data);
 
+const locations = computed(() => {
+    const op = [];
+    const currentLocations = nmw_data.value[props.year]?.locations;
+    if (!currentLocations) return op;
+
+    Object.keys(currentLocations).forEach(region => {
+        if (selected_mode.value === 0) {
+            op.push({
+                name: region,
+                value: currentLocations[region].region_total,
+            });
+        } else if (selected_mode.value === 1) {
+            Object.keys(currentLocations[region]).forEach(state => {
+                if (state !== "region_total") {
+                    op.push({
+                        name: state,
+                        value: currentLocations[region][state].state_total,
+                    });
+                }
+            });
+        }
+    });
+
+    return op.sort((a, b) => b.value - a.value);
+});
+
+const map_modes = ["regions", "states"]
+const selected_mode = ref(0)
+const selected_map_level = computed(() => map_modes[selected_mode.value])
+const showLabels = ref(true);
 const polygons = ref(null);
 const path = ref(null);
 const svg = ref({});
@@ -201,41 +262,39 @@ const state_max = ref(0);
 const height = ref(0);
 const width = ref(0);
 const tooltip = ref(null);
-const containerID = ref("containerIDPrefix" + Math.floor(Math.random() * 1000)); // Generate a unique container ID
 
-watch(() => props.data, () => {
-	init()
-})
-
-watch(() => props.labels, () => {
-	init();
-})
-
-watch(() => props.year, () => {
-	init();
-})
-
+watch(() => locations.value, (newVal, oldVal) => {
+	if(Object.keys(oldVal).length ==0) {
+		init()
+	} else {
+		updateMap()
+	}
+});
+watch(() => selected_map_level.value, () => init());
+watch(() => showLabels.value, () => init());
 onMounted(() => {
-	init()
-})
+	init();
+	window.addEventListener('resize', handleResize);
+});
 
-const zoom = () => d3.zoom()
-	.scaleExtent([0.5, 10])
-	.on("zoom", handleZoom)
+const handleResize = () => {
+    console.log("Re-run the init function when the page width changes")
+    init();
+};
+
+const zoom = () => d3.zoom().scaleExtent([0.5, 10]).on("zoom", handleZoom)
 
 const handleZoom = (event) => {
-	const {transform} = event
 	svg.value.selectAll(".map-boundary, .map-labels, .polygons")
-		.attr('transform', transform)
+		.attr('transform', event.transform)
 }
 const format_number = (num) => num.toString().replace(/\B(?=(\d{3})+(?!\d))/g, ",");
 
 const capitalizeWords = (str) => str ? str.charAt(0).toUpperCase() + str.slice(1) : "";
 
 const getMatchingPolygon = (polygon) => {
-	const {level, data} = props;
-	const key = level.slice(0, -1)
-	return data.find((d) => d.name == polygon[key])
+	const key = selected_map_level.value.slice(0, -1)
+	return locations.value.find((d) => d.name == polygon[key])
 }
 
 const color_polygon = (polygon) => colors.value(getMatchingPolygon(polygon)?.value ?? 0)
@@ -244,16 +303,17 @@ const init = ()  => {
 	init_vars()
 	init_tooltip()
 	init_colors()
+	init_legend()
+	init_svg()
 	renderMap()
 }
 const init_vars = ()  => {
-	containerID.value = "map-container_" + props.year
 	polygons.value = null
 	path.value = null
 	svg.value = {}
-	height.value = window.innerHeight * 0.6
-	width.value = window.innerWidth * 0.75
-	projection.value = d3.geoMercator().scale(750).center([75, 22])
+	height.value = window.innerHeight * 0.9
+	width.value = window.innerWidth * 0.5
+	projection.value = d3.geoMercator().scale(850).center([87.5, 27.5])
 	path.value = d3.geoPath().projection(projection.value)
 }
 
@@ -272,7 +332,7 @@ const init_tooltip = () => {
 const init_legend = () => {
 	legend.value = d3Legend.legendColor()
 					.shapeHeight(20)
-					.shapeWidth(40)
+					.shapeWidth(60)
 					.scale(colors.value)
 					.labelFormat(d3.format(",.0f"))
 					.orient('horizontal')
@@ -282,26 +342,25 @@ const init_legend = () => {
 }
 
 const init_colors = () => {
-	const max = Math.max(...props.data.map((d) => d.value))
+	const max = Math.max(...locations.value.map((d) => d.value))
 	colors.value = d3.scaleLinear()
 		.domain([0, 1, max * 0.25, max])
 		.range(["#f77", "#ca0", "#ada", "#3d3"])
 		.clamp(true)
 }
 
-const renderMap = () => {
-	init_legend()
-
-	if (!d3.select(`#containerID svg.svg-content`).empty()) {
-		d3.select(`#containerID svg.svg-content`).remove()
+const init_svg = () => {
+	if (!d3.select(`#svg-container svg.svg-content`).empty()) {
+		d3.select(`#svg-container svg.svg-content`).remove()
 	}
-	svg.value = d3.select(`#containerID`)
+	svg.value = d3.select(`#svg-container`)
 				.append("svg")
 					.attr("preserveAspectRatio", "xMinYMin meet")
 					.attr("width", width.value)
 					.attr("height", height.value)
 					.classed("svg-content", true)
-
+}
+const renderMap = () => {
 	let base = svg.value.append("g")
 		.classed("map-boundary", true)
 		.selectAll("path").append("g")
@@ -319,20 +378,49 @@ const renderMap = () => {
 
 	json.value.features.forEach((polygon) => {
 		drawPolygon(polygon)
-		if(props.labels){
-			drawPolygonLabel(base_text, polygon)
-		}
+		drawPolygonLabel(base_text, polygon)
 	})
 
 	svg.value.call(zoom())
 	legendGroup.call(legend.value);
-	// console.log(json.value)
 }
+
+const updateMap = () => {
+    init_colors()
+	init_legend()
+
+	svg.value.select(".map-legend").call(legend.value);
+	updateColors()
+	updateLabels()
+};
+
+const updateColors = () => {
+    const path = svg.value.selectAll("path")
+        .data(json.value.features)
+	path.transition()
+        .duration(350)
+        .attr("fill", (d) => color_polygon(d.properties));
+};
+
+const updateLabels = () => {
+    const base_text = svg.value.select(".map-labels");
+    base_text.selectAll("text").remove();
+
+    if (showLabels.value) {
+        json.value.features.forEach((polygon) => {
+            drawPolygonLabel(base_text, polygon);
+        });
+		base_text.selectAll("text")
+            .transition()
+            .duration(1350);
+    }
+};
 
 const drawPolygon = (polygon) => {
 	polygons.value.append("g")
 		.data([polygon])
 		.enter().append("path")
+		.classed("map-polygon", true)
 		.attr("d", path.value)
 		.attr("fill", (d) => color_polygon(polygon.properties))
 		.on('mouseover', (d, i) => {
@@ -348,6 +436,7 @@ const drawPolygon = (polygon) => {
 }
 
 const drawPolygonLabel = (base_text, polygon) => {
+	if(!showLabels.value) return
 	let polygon_data = getMatchingPolygon(polygon.properties)
 	let label_text = ""
 	const centroid = projection.value(d3.geoCentroid(polygon));
@@ -373,23 +462,14 @@ const drawPolygonLabel = (base_text, polygon) => {
 				.style('left', event.pageX + 10 + 'px')
 		})
 		.on('mouseout', () => tooltip.value.html(``).style('visibility', 'hidden'))
-	// console.log(base_text, centroid)
-
-
-
 }
 
 const hover_text = (properties) => {
-	const {level, data} = props;
-	const key = level.slice(0, -1)
-	let polygon_data =  data.find((d) => d.name == properties[key])
-
-	if(!polygon_data) {
-		polygon_data = {
-			name: properties[key],
-			value: 0
-		}
-	}
-	return `<table><tr><td>${polygon_data.name}</td><td>${polygon_data.value}</td></tr></table>`
+	const key = selected_map_level.value.slice(0, -1);
+	let polygon_data = locations.value.find((d) => d.name == properties[key]) || {
+		name: properties[key],
+		value: 0
+	};
+	return `<table><tr><td>${polygon_data.name}</td><td>${polygon_data.value}</td></tr></table>`;
 }
 </script>

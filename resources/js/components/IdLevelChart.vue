@@ -1,23 +1,8 @@
 <style></style>
 
 <template>
-    <div class="d-flex flex-column border border-info m-1 rounded p-1 gap-2">
-        <D3PieChart :data="data" class="mx-auto" />
-        <div class="btn-group">
-            <button
-                type="button"
-                class="btn btn-sm"
-                v-for="(mode, m_id) in data_modes"
-                :key="m_id"
-                :class="
-                    selected_data_mode == m_id
-                        ? 'btn-success'
-                        : 'btn-outline-secondary'
-                "
-                v-text="mode"
-                @click="selected_data_mode = m_id"
-            />
-        </div>
+    <div class="d-flex flex-column m-1 rounded p-1 gap-2">
+        <D3PieChart :year="year" class="mx-auto" />
     </div>
 </template>
 

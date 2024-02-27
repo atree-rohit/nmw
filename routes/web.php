@@ -25,6 +25,7 @@ Route::get('locations', [HomeController::class, 'locations']);
 Route::get('import', [ImportController::class, 'import']);
 Route::get('clean', [InatObservationController::class, 'clean']);
 Route::get('all_observations_table', [InatObservationController::class, 'all_observations_table']);
+Route::get('generate_data_json', [InatObservationController::class, 'generate_data_json']);
 // Route::get('pull_data', [ImportController::class, 'pull_data']);
 
 // Route::post('add_data', [ImportController::class, 'add_data']);
